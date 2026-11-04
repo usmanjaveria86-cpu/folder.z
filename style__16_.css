@@ -1,0 +1,1053 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@700&display=swap');
+/* ===== BASE ===== */
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050414;color:#f6e9ff;font-family:"Courier New",monospace}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
+.hidden{display:none!important}
+.screen{position:fixed;inset:0}
+:root{--pink:#ff9ac9;--lav:#c98bff}
+:focus-visible{outline:2px dashed #ffd0ef;outline-offset:3px}
+
+/* every scene is drawn on a tiny canvas and stretched = real pixel art */
+.px{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none}
+.px.tw{animation:twinkle 3s infinite alternate}
+
+/* ===== BOOT ===== */
+#boot{background:radial-gradient(circle at 50% 20%,#150a30,#050414 60%);overflow:hidden}
+.boot-cosmic{position:absolute;inset:0;filter:blur(15px);background:radial-gradient(ellipse at 80% 15%,#ffb37a55,transparent 45%),radial-gradient(ellipse at 15% 80%,#9d6bff44,transparent 45%)}
+.boot-moon{position:absolute;right:9%;top:12%;width:90px;height:90px;border-radius:50%;
+ background:radial-gradient(circle at 32% 30%,#ffd9f0,#ff9ac9 35%,#b57be0 65%,#6b7fd7);box-shadow:0 0 60px #ff9ac966;animation:beat 5s infinite}
+.boot-terminal{position:absolute;left:8%;right:8%;top:12%;bottom:12%;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;
+ font-size:clamp(13px,2vw,17px);line-height:1.7;color:#d9c9ff;z-index:5}
+.boot-line{margin:0;opacity:0;animation:fadein .5s forwards}
+.boot-line.ok{color:#b9ffe0}.boot-line.hush{color:#8a7aad;font-style:italic}
+.boot-line.file{color:#ffd0ef;font-size:1.4em;letter-spacing:3px;text-shadow:0 0 22px #ff9ac9}
+.boot-bar-track{width:min(340px,70%);height:6px;border-radius:9px;background:#1c1236;overflow:hidden}
+.boot-bar-fill{height:100%;width:0;background:linear-gradient(90deg,#ff9ac9,#c9a4ff,#ffd39a);transition:width 2.1s}
+.boot-choices{display:flex;flex-wrap:wrap;gap:12px}
+
+/* ===== BUTTONS (pills) / HUD ===== */
+.pixel-button,.boot-choices button{border:1px solid #ff9ac988;border-radius:999px;padding:11px 26px;letter-spacing:1.5px;text-transform:lowercase;
+ background:radial-gradient(circle at 30% 20%,#2a1550,#150a2c 70%);box-shadow:0 6px 22px #c98bff22,0 0 18px #ff9ac922;transition:.25s}
+.pixel-button:hover,.boot-choices button:hover{transform:translateY(-2px);box-shadow:0 8px 28px #c98bff44,0 0 26px #ff9ac955}
+#hud{position:fixed;z-index:120;left:0;right:0;top:0;padding:16px 22px;display:flex;justify-content:space-between;font-size:12px;font-style:italic;text-transform:lowercase;pointer-events:none;color:#c9a4e6aa}
+#hud span{color:#fff0fa}#musicToggle{pointer-events:auto;color:#ffb3de;margin-left:10px;border:1px solid #7a4aa8;border-radius:99px;padding:4px 10px}
+
+/* ===== GAME SHELL / WORLDS ===== */
+#game{display:none;position:fixed;inset:0}#game.visible{display:block}
+.world{position:absolute;inset:0;display:none;overflow:hidden;background:#050414}
+.world.active{display:block}
+.world::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:50;background:repeating-linear-gradient(0deg,#ffffff06 0 1px,transparent 1px 4px)}
+.world-title{position:absolute;top:7%;left:6%;z-index:20;font-size:13px;letter-spacing:4px;color:#e9c9ff;text-shadow:0 0 14px #c98bff}
+.world-title small{display:block;font-size:clamp(18px,3.6vw,28px);color:#fff3ff;margin-top:8px;letter-spacing:2px}
+.world-subtitle{position:absolute;top:19%;left:6%;z-index:20;color:#c9a4e6;font-size:13px;max-width:70%}
+
+/* clickable hotspots laid over the pixel art */
+.hot{position:absolute;z-index:10;cursor:pointer;border-radius:50%;transition:.3s}
+.hot:hover,.hot:focus-visible{box-shadow:0 0 22px #ff9ac9bb,inset 0 0 16px #ffd0ef55;outline:none}
+.hot.visited{box-shadow:0 0 12px #c98bff66}
+.hot.fall{border-radius:30%;background:repeating-linear-gradient(180deg,#ffffff22 0 6px,transparent 6px 12px);animation:water .6s steps(4) infinite}
+
+/* butterflies, fireflies, shooting star */
+#butterflies,#fireflies{position:absolute;inset:0;pointer-events:none;z-index:18}
+.butterfly{position:absolute;font-size:18px;filter:drop-shadow(0 0 5px #ffb4d0);animation:fly 7s ease-in-out infinite}
+.butterfly:nth-child(2n){color:#c8a5ff}.butterfly:nth-child(3n){color:#a9f5d0}
+.firefly{position:absolute;width:4px;height:4px;background:#ffe3a0;box-shadow:0 0 10px #ffe3a0;animation:floaty 3s ease-in-out infinite alternate}
+.shooting-star{position:absolute;left:-15%;top:20%;width:170px;height:3px;background:linear-gradient(90deg,transparent,#fff,#ffb6cf);box-shadow:0 0 12px #fff;transform:rotate(-18deg);z-index:25;animation:shoot 8s linear forwards}
+.star-message{position:absolute;right:0;top:-34px;white-space:nowrap;font-size:18px;color:#fff;animation:fadeMsg 8s linear forwards}
+
+/* ===== WORLD 2 — MEMORY ORBS ===== */
+.memory-orbs{position:absolute;inset:0;z-index:12}
+.memory-orb{position:absolute;width:34px;height:34px;border-radius:50%;border:1px solid #ffd0ef;box-shadow:0 0 25px #ff9ac9;background:radial-gradient(#ffd0ef55,transparent 70%);animation:orb 3s infinite alternate}
+.memory-orb.seen{opacity:.45}
+
+/* ===== WORLD 3 — PICNIC STORY ===== */
+.story-stage{position:absolute;inset:0;z-index:15}
+.story-photo{position:absolute;left:50%;top:40%;width:min(54vw,250px);aspect-ratio:1;translate:-50% -50%;border-radius:14%;overflow:hidden;cursor:pointer;
+ box-shadow:0 0 0 4px #fff,0 10px 30px #0006,0 0 30px #ff9ac977;z-index:20;
+ transition:left .9s ease,top .9s ease,width .9s ease,rotate .9s ease,opacity .9s,filter .9s}
+.story-photo canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
+.story-photo.jumpin{animation:jumpin .9s cubic-bezier(.2,1.4,.4,1)}
+.story-photo.batch{left:var(--bl);top:var(--ft,36%);width:var(--bw,min(28vw,200px));rotate:var(--br)}
+.story-photo.pile{left:var(--pl);top:var(--pt);width:min(18vw,86px);rotate:var(--pr);z-index:3;opacity:.9;cursor:default;box-shadow:0 0 0 3px #fff8,0 4px 14px #0004}
+.bubble{position:absolute;left:50%;top:68%;translate:-50% 0;width:min(520px,88vw);padding:16px 24px;text-align:center;line-height:1.6;z-index:25;
+ background:#fffaf2;color:#3a2540;border-radius:36px;box-shadow:0 10px 30px #0004;font-size:clamp(13px,2.3vw,16px);animation:fadein .5s both}
+.bubble::before{content:"";position:absolute;left:50%;top:-12px;translate:-50% 0;border:12px solid transparent;border-top:0;border-bottom-color:#fffaf2}
+.bubble small{display:block;margin-top:8px;color:#b36e9c;font-size:11px}
+
+/* ===== WORLD 4 — INSIDE THE HEART ===== */
+.heart-hint{position:absolute;left:50%;top:5%;translate:-50% 0;text-align:center;z-index:30;color:#ffd0ef;font-size:13px;letter-spacing:2px;text-shadow:0 0 14px #ff5b8a;pointer-events:none}
+.heart-hint b{display:block;font-size:clamp(15px,3vw,22px);color:#fff;margin-top:6px;letter-spacing:1px}
+.heart-box{position:absolute;left:50%;top:54%;translate:-50% -50%;width:min(96vw,calc(86vh*1.09));aspect-ratio:48/44;z-index:5}
+.heart-box>canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;filter:drop-shadow(0 0 40px #ff5b8acc);animation:beat 2.6s infinite ease-in-out}
+.envelope-field{position:absolute;inset:0}
+.heart-envelope{position:absolute;width:clamp(40px,7vw,60px);aspect-ratio:3/2;translate:-50% -50%;z-index:6;animation:bob 3s ease-in-out infinite alternate}
+.heart-envelope .env-body{position:absolute;inset:0;border-radius:6px;background:linear-gradient(160deg,#fff0f8,#ffc2e2);box-shadow:0 4px 14px #0005,0 0 16px #fff6;transition:.3s}
+.heart-envelope .env-flap{position:absolute;inset:0;clip-path:polygon(0 0,50% 58%,100% 0);background:linear-gradient(160deg,#ffd4ea,#ff9ac9);transition:.3s}
+.heart-envelope .env-seal{position:absolute;left:50%;top:60%;translate:-50% -50%;font-size:11px;color:#d1447d}
+.heart-envelope:hover .env-body,.heart-envelope:hover .env-flap,.heart-envelope:focus-visible .env-body,.heart-envelope:focus-visible .env-flap{transform:scale(1.18)}
+.env-tooltip{position:absolute;left:50%;bottom:130%;translate:-50% 0;white-space:nowrap;font-size:11px;font-weight:bold;color:#241a7a;padding:5px 12px;border-radius:14px;background:#f3ecff;box-shadow:0 0 14px #9d6bffaa,0 4px 12px #0006;opacity:0;transition:.25s;pointer-events:none}
+.heart-envelope:hover .env-tooltip,.heart-envelope:focus-visible .env-tooltip{opacity:1}
+.heart-envelope.opened .env-body,.heart-envelope.opened .env-flap{opacity:.4}
+.letter-stage{position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:radial-gradient(circle,#150a2cdd,#050310f2 80%);backdrop-filter:blur(3px)}
+.stage-envelope{position:relative;width:min(360px,80vw);height:230px;animation:fadein .6s both}
+.stage-envelope .env-body{position:absolute;inset:0;border-radius:14px;background:linear-gradient(160deg,#fff0f8,#ffc2e2);box-shadow:0 20px 50px #0008}
+.stage-envelope .env-flap{position:absolute;inset:0;clip-path:polygon(0 0,50% 58%,100% 0);background:linear-gradient(160deg,#ffd4ea,#ff9ac9);transform-origin:top;transition:transform .7s ease .3s;z-index:1}
+.stage-envelope.open .env-flap{transform:rotateX(180deg);z-index:0}
+.stage-letter{position:absolute;left:50%;bottom:6%;translate:-50% 0;width:90%;max-height:0;overflow:auto;padding:0 24px;text-align:center;color:#2a2036;background:#fff8f0;border-radius:22px;
+ box-shadow:0 18px 40px #0007;transition:max-height .9s ease .7s,padding .9s ease .7s,translate .9s ease .7s;z-index:1}
+.stage-envelope.open .stage-letter{max-height:min(60vh,420px);padding:26px 24px 30px;translate:-50% -45%}
+.stage-letter span{display:block;font-size:11px;letter-spacing:3px;color:#b36e9c;margin-bottom:8px}
+.stage-letter h2{margin:0 0 10px;font-size:20px;color:#3a2540}
+.stage-letter p{margin:0 0 8px;line-height:1.7;font-size:14px;white-space:pre-line}
+.stage-close{position:absolute;top:-44px;right:0;font-size:28px;color:#ffeaf7}
+
+/* ===== WORLD 5 — SPACESHIP + HEART MOON ===== */
+.moon-heart{position:absolute;left:50%;top:38%;width:min(52vw,320px);aspect-ratio:48/44;translate:-50% -50%;scale:.08;opacity:.7;transition:scale 9s ease-in-out,opacity 9s;z-index:5}
+.moon-heart.near{scale:1;opacity:1}
+.moon-heart canvas{width:100%;height:100%;image-rendering:pixelated;filter:drop-shadow(0 0 50px #ff9ac9);animation:beat 1.8s infinite ease-in-out}
+.ship{position:absolute;left:8%;top:84%;width:46px;aspect-ratio:9/10;z-index:8;rotate:35deg;transition:left 9s ease-in-out,top 9s ease-in-out,opacity 1.5s,scale 9s}
+.ship canvas{width:100%;height:100%;image-rendering:pixelated;filter:drop-shadow(0 0 10px #ffb37a);animation:bob .3s infinite alternate}
+.ship.go{left:calc(50% - 23px);top:50%;scale:.6}
+.ship.arrived{opacity:0}
+#meteorLayer{position:absolute;inset:0;z-index:6;pointer-events:none}
+.meteor{position:absolute;top:-12%;width:60px;height:60px;border-radius:12%;overflow:hidden;box-shadow:0 0 18px #ffd0ef;animation:meteor 5s linear forwards}
+.meteor canvas{width:100%;height:100%;image-rendering:auto}
+.final-letter{position:absolute;left:50%;bottom:5%;translate:-50% 0;width:min(560px,88vw);max-height:46vh;overflow:auto;z-index:20;padding:26px 30px;text-align:center;
+ background:#fff8f0;color:#2a2036;border-radius:30px;box-shadow:0 0 50px #ff9ac988;line-height:1.8;font-size:clamp(13px,2.2vw,16px);white-space:pre-line;opacity:0;pointer-events:none;transition:opacity 2s}
+.final-letter.show{opacity:1;pointer-events:auto}
+
+/* ===== WORLD 6 — BIRTHDAY ===== */
+.final-space{position:absolute;inset:0;display:grid;place-items:center;z-index:10}
+.final-file{text-align:center;padding:40px;width:min(560px,86%);border-radius:50px;background:radial-gradient(circle at 30% 10%,#2a1550cc,#150a2cdd 75%);box-shadow:0 20px 60px #0008,0 0 40px #c98bff33}
+.final-file span{color:#ffd0ef;letter-spacing:4px;font-size:11px}.final-file p{color:#c9a4e6}
+.birthday-reveal{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle,#3a1c68ee,#050310f5 70%)}
+.birthday-reveal h1{font-size:clamp(26px,6.4vw,64px);line-height:1.2;margin:10px;color:#ffeaf7;text-shadow:0 0 30px var(--pink),0 0 70px var(--lav);animation:beat2 1.4s infinite}
+.birthday-lines{width:min(560px,86vw);line-height:1.9;font-size:clamp(14px,2.3vw,18px);text-shadow:0 0 14px var(--pink)}
+.birthday-lines p{margin:.5em 0;animation:fadein 2s both}
+#fxLayer{position:fixed;inset:0;z-index:600;pointer-events:none;overflow:hidden}
+#fxLayer span{position:absolute;color:#ffd0ef;text-shadow:0 0 10px var(--pink);transition:transform 1.3s ease-out,opacity 1.3s}
+.confetti{top:-14px;width:8px;height:8px;animation:fall linear forwards}
+
+/* ===== THE HAND (low, right side) ===== */
+.journey-hand{position:fixed;right:5%;bottom:6%;z-index:150;display:flex;flex-direction:row-reverse;align-items:flex-end;gap:12px;transition:opacity .4s,transform .4s}
+.journey-hand.leaving{opacity:0;transform:translateX(40px)}
+.hand-emoji{position:relative;font-size:54px;line-height:1;transform:scaleX(-1);filter:drop-shadow(0 0 18px #ff9ac9);animation:handfloat 2.4s ease-in-out infinite}
+.hand-emoji.jump{animation:handjump .9s ease}
+.hand-emoji.wave{animation:handwave 1.2s ease}
+.hand-heart{position:absolute;left:50%;top:-10px;font-size:22px;color:#ff5b8a;text-shadow:0 0 14px #ff5b8a;animation:heartup 1.8s forwards;pointer-events:none}
+.hand-msg{max-width:210px;padding:14px 20px;font-size:13px;line-height:1.6;text-align:right;color:#fff1fb;background:none;box-shadow:none;text-shadow:0 1px 8px #000a,0 0 3px #0008;transition:color .4s}
+
+/* ===== DIALOGUE (cloud) ===== */
+.dialogue{position:fixed;left:50%;bottom:20%;translate:-50% 0;z-index:180;max-width:min(620px,86%);padding:18px 32px;text-align:center;line-height:1.7;
+ background:radial-gradient(ellipse at 50% 0%,#201040ee,#140a28ee 70%);border-radius:40px 40px 46px 46px/34px 34px 40px 40px;box-shadow:0 10px 40px #0006,0 0 30px #c98bff33}
+.dialogue button{position:absolute;right:10px;top:4px;color:var(--pink);font-size:20px}
+
+/* ===== COLOUR BOOM ===== */
+.bloom-overlay{position:fixed;inset:0;z-index:500;pointer-events:none;opacity:0;--c1:#ff5b8a;--c2:#c98bff;--c3:#ffb37a}
+.bloom-overlay.bloom-active{display:block;animation:bloomFade 1.4s ease forwards}
+.bloom-burst{position:absolute;inset:-20%;background:radial-gradient(circle,#fff 0,var(--c1) 12%,var(--c2) 38%,var(--c3) 62%,transparent 78%);transform:scale(0);animation:burst 1.4s cubic-bezier(.15,.8,.25,1) forwards}
+.bloom-lightning{position:absolute;width:3px;height:140%;top:-20%;background:linear-gradient(180deg,transparent,#fff,var(--c2),transparent);opacity:0;filter:drop-shadow(0 0 10px #fff)}
+.l1{left:30%;rotate:9deg;animation:flash 1.4s .05s forwards}.l2{left:55%;rotate:-6deg;animation:flash 1.4s .15s forwards}.l3{left:72%;rotate:4deg;animation:flash 1.4s .25s forwards}
+
+/* ===== KEYFRAMES ===== */
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes twinkle{to{opacity:.35}}
+@keyframes beat{50%{transform:scale(1.06)}}
+@keyframes beat2{50%{scale:1.05}}
+@keyframes bob{to{transform:translateY(-8px)}}
+@keyframes water{to{background-position:0 12px}}
+@keyframes floaty{to{transform:translateY(-22px);opacity:.3}}
+@keyframes orb{to{transform:translateY(-22px) scale(1.2);opacity:.6}}
+@keyframes fly{25%{transform:translate(35px,-25px) rotate(12deg)}50%{transform:translate(-20px,20px)}75%{transform:translate(50px,8px) rotate(10deg)}}
+@keyframes shoot{0%{left:-20%;top:20%;opacity:0}10%,90%{opacity:1}100%{left:115%;top:50%;opacity:0}}
+@keyframes fadeMsg{0%,15%{opacity:0}30%,75%{opacity:1}100%{opacity:0}}
+@keyframes jumpin{0%{transform:translateY(120px) scale(.3);opacity:0}60%{transform:translateY(-30px) scale(1.08);opacity:1}100%{transform:none}}
+@keyframes handfloat{50%{transform:scaleX(-1) translateY(-6px)}}
+@keyframes handjump{0%,100%{transform:scaleX(-1) translateY(0)}35%{transform:scaleX(-1) translateY(-34px) scale(1.1)}60%{transform:scaleX(-1) translateY(0) scale(.95,1.05)}80%{transform:scaleX(-1) translateY(-10px)}}
+@keyframes handwave{0%,100%{transform:scaleX(-1) rotate(0)}20%{transform:scaleX(-1) rotate(25deg)}40%{transform:scaleX(-1) rotate(-20deg)}60%{transform:scaleX(-1) rotate(25deg)}80%{transform:scaleX(-1) rotate(-15deg)}}
+@keyframes heartup{from{transform:translate(-50%,0) scale(.6);opacity:1}to{transform:translate(-50%,-70px) scale(1.5);opacity:0}}
+@keyframes meteor{from{transform:translate(0,0) rotate(0)}to{transform:translate(-120vw,130vh) rotate(180deg)}}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+@keyframes bloomFade{0%{opacity:0}12%,75%{opacity:1}100%{opacity:0}}
+@keyframes burst{0%{transform:scale(0)}55%{transform:scale(1.6)}100%{transform:scale(2.4)}}
+@keyframes flash{0%,100%{opacity:0}10%,40%{opacity:.9}55%{opacity:0}70%{opacity:.6}}
+
+@media (max-width:700px){
+ .journey-hand{right:3%;bottom:4%;flex-direction:column;align-items:flex-end}
+ .hand-emoji{font-size:42px}.hand-msg{max-width:150px;font-size:11.5px;text-align:center}
+ .bubble{top:64%}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* ===== v3 additions: sprites, birds, shooting star ===== */
+#shootingStars{position:absolute;inset:0;pointer-events:none;z-index:25}
+.shooting-star{height:4px;top:14%;pointer-events:auto;cursor:pointer}
+.shooting-star::after{content:"✦";position:absolute;right:-9px;top:-11px;font-size:24px;color:#fff;text-shadow:0 0 14px #fff,0 0 24px #ff9ac9}
+.star-message{font-size:clamp(15px,2.6vw,22px);text-shadow:0 0 12px #ff9ac9,0 0 4px #000;right:20px;top:-36px}
+.bf-btn{position:absolute;width:28px;height:20px;padding:0;pointer-events:auto;cursor:pointer;animation:fly 8s ease-in-out infinite;filter:drop-shadow(0 0 5px #ffb4d0)}
+.bf-btn canvas,.bird canvas{width:100%;height:100%;image-rendering:pixelated;display:block}
+.flapx{animation:flapx .3s steps(2) infinite alternate}
+.flapy{animation:flapy .45s steps(2) infinite alternate;transform-origin:50% 100%}
+.bird{position:absolute;left:0;width:30px;height:18px;animation:birdcross linear infinite}
+@keyframes flapx{to{transform:scaleX(.4)}}
+@keyframes flapy{to{transform:scaleY(.45)}}
+@keyframes birdcross{from{transform:translateX(-12vw)}50%{transform:translateX(50vw) translateY(-14px)}to{transform:translateX(112vw)}}
+
+/* ===== v4: the room (world 2) ===== */
+.book{border-radius:2px;background:none;transition:transform .25s,box-shadow .25s}
+.book:not(.seen){animation:bookglow 2.4s ease-in-out infinite alternate}
+.book:hover,.book:focus-visible{transform:translateY(-14%);box-shadow:0 0 14px #ffd39a}
+.book .tip{position:absolute;left:50%;bottom:130%;translate:-50% 0;white-space:nowrap;font-size:11px;color:#fff;padding:5px 12px;border-radius:99px;
+ background:radial-gradient(ellipse at 50% 0,#3a1c68ee,#180d30ee);box-shadow:0 4px 14px #0008;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
+.book:hover .tip,.book:focus-visible .tip{opacity:1}
+.flame{position:absolute;width:3px;height:5px;margin:-2px 0 0 -1px;border-radius:50% 50% 40% 40%;background:#fff3c0;box-shadow:0 0 10px 3px #ffb347,0 0 24px 6px #ff9a3c66;z-index:11;pointer-events:none;animation:flicker .35s infinite alternate}
+.room-glow{position:absolute;left:-6%;top:12%;width:42%;height:70%;pointer-events:none;z-index:9;background:radial-gradient(ellipse,#ffb34730,transparent 65%);animation:flicker 2.4s infinite alternate}
+.book-view{position:absolute;left:34%;top:40%;translate:-50% -50%;width:min(56vw,260px);aspect-ratio:1;border-radius:14%;overflow:hidden;z-index:160;cursor:pointer;
+ box-shadow:0 0 0 4px #fff,0 14px 40px #000a,0 0 40px #ffd39a88;animation:jumpin .8s cubic-bezier(.2,1.4,.4,1)}
+.book-view canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
+@keyframes bookglow{to{box-shadow:0 0 10px #ffd39acc}}
+@keyframes flicker{from{opacity:.75;transform:scale(.9,1)}to{opacity:1;transform:scale(1.1,1.15)}}
+@media (max-width:700px){.book-view{left:50%}}
+
+/* ===== v6: back arms (left) - two arms reaching for you ===== */
+.back-hand{position:fixed;left:0;bottom:3%;z-index:150;display:flex;flex-direction:column;align-items:flex-start;gap:6px;animation:fadein 1s both}
+.back-msg{margin-left:3%;max-width:170px;padding:10px 16px;font-size:12px;line-height:1.6;color:#eaf8ff;background:none;box-shadow:none;text-shadow:0 1px 8px #000a,0 0 3px #0008;transition:color .4s}
+.back-arms{display:block;width:min(80px,22vw);padding:0;border:0;background:none;cursor:pointer;
+ filter:drop-shadow(0 0 14px #7ad7ff) drop-shadow(0 0 4px #ff9ac9aa);transition:filter .3s}
+.back-arms svg{display:block;width:100%;height:auto;overflow:visible}
+.back-arms:hover{filter:drop-shadow(0 0 22px #7ad7ff) drop-shadow(0 0 8px #ff9ac9)}
+.arm{animation:armreach 2.6s ease-in-out infinite}
+.arm-b{animation-delay:-1.3s}
+.back-arms:hover .arm{animation-duration:1.1s}
+@keyframes armreach{0%,100%{transform:translateX(0)}50%{transform:translateX(7px)}}
+@media (max-width:700px){.back-hand{bottom:4%}.back-msg{max-width:140px;font-size:11px;margin-left:3%}.back-arms{width:min(62px,19vw)}}
+/* hand messages follow the world: dark text on the light daytime world, light text on dark worlds */
+body.light-world .hand-msg{color:#2b1a3d;text-shadow:0 0 8px #fffc,0 0 2px #fff}
+body.light-world .back-msg{color:#1c2c52;text-shadow:0 0 8px #fffc,0 0 2px #fff}
+
+/* special falling pictures (world 5): shine, stars, comet trail, caption */
+.meteor-pic{position:absolute;top:-30%;width:clamp(92px,24vw,150px);translate:-50% 0;animation:meteorpic 9s linear forwards}
+.pic-frame{position:relative;aspect-ratio:1;border-radius:14%;overflow:hidden;box-shadow:0 0 0 3px #fff,0 0 22px #fff,0 0 50px #ffb8e6;animation:picglow 1.6s ease-in-out infinite}
+.pic-frame canvas{width:100%;height:100%;display:block;image-rendering:auto}
+.pic-frame .shine{position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,#fffc 50%,transparent 65%);transform:translateX(-120%);animation:picshine 2.4s ease-in-out infinite}
+.meteor-pic .trail{position:absolute;left:50%;bottom:50%;width:8px;height:190px;margin-left:-4px;border-radius:8px;transform-origin:50% 100%;rotate:25deg;background:linear-gradient(to top,#ffd0efcc,#ffd0ef00);filter:blur(1.5px);z-index:-1}
+.pic-star{position:absolute;color:#fff;font-size:18px;text-shadow:0 0 10px #fff,0 0 18px #ff9ac9;animation:pictwinkle 1.4s ease-in-out infinite}
+.pic-star.s0{left:-14%;top:-8%}.pic-star.s1{right:-16%;top:6%;font-size:24px}.pic-star.s2{left:-20%;top:46%;font-size:22px}
+.pic-star.s3{right:-12%;top:62%}.pic-star.s4{left:18%;top:-16%;font-size:14px}.pic-star.s5{right:20%;top:-14%;font-size:16px}
+.pic-cap{position:relative;left:50%;transform:translateX(-50%);width:max-content;max-width:min(200px,52vw);margin-top:10px;text-align:center;font-size:12px;line-height:1.5;color:#fff;
+ text-shadow:0 0 10px #ff9ac9,0 0 4px #c98bff,0 2px 5px #000}
+@keyframes meteorpic{0%{transform:translate(0,0) rotate(-4deg)}50%{transform:translate(-22vw,70vh) rotate(3deg)}100%{transform:translate(-45vw,145vh) rotate(-3deg)}}
+@keyframes picglow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25)}}
+@keyframes picshine{0%,30%{transform:translateX(-120%)}70%,100%{transform:translateX(120%)}}
+@keyframes pictwinkle{0%,100%{opacity:.25;scale:.6}50%{opacity:1;scale:1.25}}
+@media (max-width:700px){.pic-cap{font-size:11px}}
+
+/* picture opened as a glowing heart (world 2) + its caption */
+.book-view.heart{width:min(62vw,300px);top:42%;border-radius:0;overflow:visible;box-shadow:none;background:none;
+ filter:drop-shadow(0 0 14px #ff9ac9) drop-shadow(0 0 36px #ff5b8acc)}
+.book-view.heart::before{content:"";position:absolute;inset:-2.5%;background:#fff;clip-path:url(#heartClip)}
+.book-view.heart canvas{position:relative;clip-path:url(#heartClip);image-rendering:auto}
+.heart-cap{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:16px;width:max-content;max-width:min(300px,80vw);text-align:center;
+ font-size:13px;line-height:1.5;color:#fff;text-shadow:0 0 12px #ff9ac9,0 0 5px #ff5b8a,0 2px 6px #000}
+
+/* giant red heart for the favourite picture (world 2) + caption with floating hearts */
+.book-view.heart{left:50%;top:46%;width:min(84vw,62vh);
+ animation:jumpin .8s cubic-bezier(.2,1.4,.4,1),hbeat 1.7s ease-in-out .8s infinite;
+ filter:drop-shadow(0 0 16px #ff2d55) drop-shadow(0 0 46px #ff2d55aa)}
+.book-view.heart::before{inset:0;background:radial-gradient(circle at 32% 24%,#ff7a90,#e0143c 46%,#9a0022)}
+.book-view.heart canvas{scale:.9;translate:0 2.5%}
+.heart-cap{margin-top:14px;max-width:min(420px,88vw);font-size:clamp(15px,2.8vw,21px);letter-spacing:.5px;color:#fff;
+ text-shadow:0 0 14px #ff2d55,0 0 6px #ff6b81,0 2px 6px #000}
+.float-heart{position:absolute;bottom:-2px;pointer-events:none;text-shadow:0 0 8px #ff2d55;animation:floatheart 3.2s ease-out forwards;z-index:2}
+@keyframes hbeat{0%,100%{scale:1}50%{scale:1.035}}
+@keyframes floatheart{0%{transform:translateY(0) translateX(0) scale(.5);opacity:0}15%{opacity:1}60%{transform:translateY(-70px) translateX(10px) scale(1)}100%{transform:translateY(-130px) translateX(-10px) scale(1.15);opacity:0}}
+
+/* ===== v7: gallery book (world 2 "our late night") ===== */
+.book-view.gallery{left:0;top:0;right:0;bottom:0;translate:none;width:auto;aspect-ratio:auto;border-radius:0;overflow:auto;cursor:default;display:grid;place-items:center;
+ background:radial-gradient(circle at 50% 40%,#2a1550ee,#050310f5 80%);backdrop-filter:blur(3px);box-shadow:none;animation:fadein .5s both}
+.gal-close{position:absolute;top:14px;right:18px;font-size:32px;line-height:1;color:#ffeaf7;text-shadow:0 0 12px #ff9ac9;z-index:3}
+.gal-stage{display:flex;flex-direction:column;align-items:center;gap:22px;padding:60px 16px 30px;max-width:100%}
+.gal-groups{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:34px 46px}
+.gal-group{display:flex;flex-direction:column;align-items:center;gap:16px}
+.gal-pics{display:flex;gap:18px;align-items:center;justify-content:center}
+.gal-pic{display:block;padding:0;border-radius:10px;overflow:hidden;cursor:pointer;rotate:var(--gr,0deg);
+ box-shadow:0 0 0 4px #fff,0 12px 34px #000a,0 0 32px #ffd39a88;transition:scale .2s,opacity .55s}
+.gal-pic:hover{scale:1.04}
+.gal-pic.jumpin{animation:jumpin .9s cubic-bezier(.2,1.4,.4,1) both}
+.gal-pic.vanish{opacity:0}
+.gal-pic canvas{display:block;width:auto;height:auto;max-height:38vh;max-width:30vw;image-rendering:pixelated}
+.gal-cap{width:max-content;max-width:min(300px,80vw);text-align:center;font-size:clamp(14px,2.3vw,19px);line-height:1.5;color:#fff;opacity:0;transition:opacity .7s;
+ text-shadow:0 0 12px #ff9ac9,0 0 5px #c98bff,0 2px 6px #000}
+.gal-cap.show{opacity:1}
+.gal-point{display:flex;flex-direction:column;align-items:center;gap:2px;color:#ffd0ef;animation:fadein .6s both}
+.gal-point .finger{font-size:46px;line-height:1;filter:drop-shadow(0 0 14px #ff9ac9);animation:galpoint 1s ease-in-out infinite}
+.gal-point small{font-size:12px;letter-spacing:3px;text-transform:lowercase;text-shadow:0 0 10px #ff9ac9}
+@keyframes galpoint{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@media (max-width:700px){
+ .gal-groups{flex-direction:column;align-items:center;gap:22px}
+ .gal-stage{padding-top:52px;gap:14px}
+ .gal-pics{gap:12px}
+ .gal-pic canvas{max-width:42vw;max-height:25vh}
+}
+
+/* ===== v8: sunset beach (world 6) ===== */
+.sunset-birds{position:absolute;inset:0;pointer-events:none;z-index:12}
+.sunbird{position:absolute;width:36px;height:21px;left:var(--x0);top:var(--y0);translate:-50% -50%;opacity:0;
+ transition:left 6.5s cubic-bezier(.3,.1,.3,1) var(--d,0s),top 6.5s cubic-bezier(.3,.1,.3,1) var(--d,0s),opacity 1.6s ease var(--d,0s)}
+.sunbird.fly{left:var(--x1);top:var(--y1);opacity:1}
+.sunbird canvas{width:100%;height:100%;image-rendering:pixelated;display:block}
+.sunbird.arrived{animation:sunbob 2.8s ease-in-out infinite alternate}
+@keyframes sunbob{to{transform:translateY(-8px)}}
+.sunset-text{position:absolute;left:50%;top:29%;translate:-50% 0;width:min(780px,92vw);text-align:center;z-index:14;pointer-events:none;
+ font-size:clamp(17px,3.4vw,28px);line-height:1.7;letter-spacing:1px;color:#fff;white-space:pre-line;opacity:0;transition:opacity 1.2s;
+ text-shadow:0 0 18px #ff5b9a,0 0 7px #b0307a,0 2px 6px #5a1a5acc}
+.sunset-text.show{opacity:1}
+
+/* ===== v9: long story texts (scroll inside the bubble) ===== */
+.bubble .bs{overflow-y:auto;white-space:pre-line;padding:0 8px;scrollbar-width:thin;scrollbar-color:#e7a6cf transparent}
+.bubble.long{top:var(--bt,53%);width:min(720px,92vw);font-size:clamp(12px,2vw,15px);line-height:1.65}
+@media (max-width:700px){body.reading .hand-msg,body.reading .back-msg{opacity:0;visibility:hidden}}
+
+/* ===== v10: zyad's galaxy — the heart bursts, the world turns candy pink ===== */
+.moon-heart.burst{transition:scale .35s cubic-bezier(.5,0,1,.6),opacity .35s ease-in;scale:1.7;opacity:0}
+.burst-fx{position:absolute;inset:0;z-index:30;pointer-events:none;overflow:hidden}
+.burst-flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 38%,#fff 0,#ffe3f0 30%,#ffc2de66 60%,transparent 80%);opacity:0;animation:bflash 1s ease-out forwards}
+@keyframes bflash{0%{opacity:0}14%{opacity:1}100%{opacity:0}}
+.burst-ring{position:absolute;left:50%;top:38%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:6px solid #fff;box-shadow:0 0 30px #ff9ac9,inset 0 0 20px #ff9ac9;animation:bring 1.1s ease-out forwards}
+.burst-ring.r2{border-color:#ffd23f;animation-delay:.18s;opacity:0}
+@keyframes bring{from{scale:.2;opacity:.95}to{scale:28;opacity:0}}
+.burst-bit{position:absolute;left:50%;top:38%;width:var(--z);height:var(--z);margin:calc(var(--z) / -2) 0 0 calc(var(--z) / -2);background:var(--c);border-radius:2px;color:var(--c);text-align:center;line-height:1;box-shadow:0 0 10px var(--c);animation:bbit 1.6s cubic-bezier(.1,.7,.3,1) forwards}
+.burst-bit:not(:empty){background:none;box-shadow:none;text-shadow:0 0 10px var(--c);font-size:calc(var(--z) * 1.8)}
+@keyframes bbit{0%{transform:translate(0,0) rotate(0) scale(1.6);opacity:1}100%{transform:translate(calc(var(--dx) * 1vw),calc(var(--dy) * 1vh)) rotate(var(--rot)) scale(.5);opacity:0}}
+.candy-bg{position:absolute;inset:0;z-index:3;opacity:0;transition:opacity .5s ease-out;pointer-events:none;
+ background:radial-gradient(circle at 28% 18%,#ffffff70 0,transparent 42%),radial-gradient(circle at 80% 72%,#ffffff38 0,transparent 40%),linear-gradient(#ff7fb2,#ffa6c9 52%,#ffc9de)}
+.candy-bg.on{opacity:1}
+.candy-bg::after{content:"";position:absolute;inset:0;background-image:radial-gradient(#ffffff66 2px,transparent 3px);background-size:46px 46px;opacity:.45}
+.candy-fx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.candy-fx.balloons{z-index:4}.candy-fx.stars{z-index:5}
+.balloon{position:absolute;left:var(--x);bottom:-48%;width:var(--s);animation:balloonUp var(--t) linear var(--d) both}
+.balloon .bsw{transform-origin:50% 100%;animation:bsway 3.4s ease-in-out infinite alternate}
+.balloon svg{display:block;width:100%;height:auto;filter:drop-shadow(0 6px 8px #b0306a55)}
+@keyframes balloonUp{0%{transform:translateY(0);opacity:0}5%{opacity:1}100%{transform:translateY(-190vh);opacity:1}}
+@keyframes bsway{from{rotate:-6deg;translate:-8px 0}to{rotate:6deg;translate:8px 0}}
+.sconf{position:absolute;top:-6%;left:var(--x);width:var(--s);height:var(--s);
+ clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+ background:linear-gradient(135deg,#fff 0%,#cfd3de 28%,#8d93a6 48%,#f6f8fc 62%,#a9afc0 100%);background-size:220% 220%;
+ animation:sconfFall var(--t) linear var(--d) both,sconfSpin var(--sp) linear infinite,sconfGlint 1.1s ease-in-out infinite alternate}
+@keyframes sconfFall{from{transform:translate(0,0)}to{transform:translate(var(--dx),118vh)}}
+@keyframes sconfSpin{from{rotate:1 1 0 0deg}to{rotate:1 1 0 360deg}}
+@keyframes sconfGlint{from{background-position:0 0}to{background-position:100% 100%}}
+
+/* ===== v11: candy galaxy = the same pixel galaxy, repainted pink (planets stay) ===== */
+.candy-sky{position:absolute;inset:0;z-index:3;opacity:0;transition:opacity .5s ease-out;pointer-events:none}
+.candy-sky.on{opacity:1}
+.candy-sky::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 28% 18%,#ffffff55 0,transparent 42%),radial-gradient(circle at 80% 72%,#ffffff2a 0,transparent 40%)}
+.world.candy .pic-cap{color:#3b0d63;font-weight:700;font-size:13px;text-shadow:0 0 7px #ffffffee,0 0 3px #fff,0 0 12px #ffffff99}
+body.candy-world #hud,body.candy-world #hud span,body.candy-world #hud button{color:#4b1470!important;text-shadow:0 0 8px #fffc,0 0 2px #fff}
+body.candy-world #hud button{border-color:#4b1470aa}
+
+/* ===== v12: the shore — the birds pull up a heart-shaped letter while the sunset changes colour ===== */
+.sun-strings{position:absolute;inset:0;width:100%;height:100%;z-index:10;pointer-events:none;overflow:visible;transition:opacity .9s}
+.sun-strings line{stroke:#2a1233;stroke-opacity:.6;stroke-width:1.3}
+.sun-letter{position:absolute;left:50%;top:62%;width:clamp(70px,11vw,110px);aspect-ratio:100/92;translate:-50% -50%;z-index:11;opacity:0;container-type:inline-size;pointer-events:none;
+ --veil:#ffd6e6;--ink:#3a1030;--halo:0 0 10px #ffffffb0,0 0 3px #fffc;--edge:#fff;--bigw:min(100vw,calc(84vh * 1.087));transition:opacity 1.4s}
+.sun-letter.lift{top:38%;opacity:1;transition:top 6.5s cubic-bezier(.3,.1,.3,1) .9s,opacity 1.4s ease .9s}
+.sun-letter.open{top:50%;width:var(--bigw);opacity:1;pointer-events:auto;transition:top 3s cubic-bezier(.3,.9,.3,1),width 3s cubic-bezier(.3,.9,.3,1)}
+.sl-heart{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 14px #ff9acaaa);animation:slbeat 3.4s ease-in-out infinite}
+.sl-fill{fill:var(--veil);stroke:var(--edge);stroke-width:2px;vector-effect:non-scaling-stroke;transition:fill 1.6s,stroke 1.6s}
+.sl-stitch{fill:none;stroke:var(--edge);stroke-opacity:.55;stroke-width:1.2px;stroke-dasharray:5 5;vector-effect:non-scaling-stroke;transition:stroke 1.6s}
+.sl-text{position:absolute;left:20%;width:60%;top:23%;height:41%;overflow-y:auto;overflow-x:hidden;padding:1.5em 0 1.8em;text-align:center;
+ font-size:14px;font-size:clamp(11px,2.3cqw,22px);line-height:1.65;color:var(--ink);text-shadow:var(--halo);opacity:0;outline:none;
+ transition:opacity 1.6s,color 1.2s,text-shadow 1.2s;scrollbar-width:thin;scrollbar-color:#ffffff55 transparent;
+ -webkit-mask-image:linear-gradient(transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(transparent,#000 10%,#000 90%,transparent)}
+.sun-letter.open .sl-text{opacity:1}
+.sl-text h3{margin:0 0 .8em;font-size:1.05em;font-weight:700;letter-spacing:.18em}
+.sl-text p{margin:0 0 .9em}
+.sl-text .w{opacity:0;transition:opacity .9s ease}.sl-text .w.on{opacity:1}
+@keyframes slbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.015)}}
+@media (max-aspect-ratio:4/5){.sun-letter{aspect-ratio:100/118}.sun-letter.open{--bigw:min(100vw,calc(84vh / 1.18))}}
+/* corner texts + HUD stay readable on every colour of the changing sunset */
+body.shore #hud,body.shore #hud span{color:#fff;text-shadow:0 0 7px #000b,0 1px 3px #000}
+body.shore #musicToggle{border-color:#fffa}
+body.shore .hand-msg,body.shore .back-msg{color:#fff8fc;text-shadow:0 0 6px #000d,0 1px 3px #000,0 0 16px #0009}
+
+/* ===== v13: long letters in the heart world ===== */
+.env-tooltip{white-space:normal;width:max-content;max-width:min(250px,70vw);text-align:center;line-height:1.35}
+.stage-letter{top:50%;bottom:auto;translate:-50% -50%;width:min(640px,92vw);opacity:0;text-align:left;scrollbar-width:thin;scrollbar-color:#c98bff #0000;
+ transition:max-height .9s ease .7s,padding .9s ease .7s,opacity .6s ease .7s}
+.stage-envelope.open .stage-letter{max-height:min(76vh,620px);padding:26px 30px 32px;translate:-50% -50%;opacity:1}
+.stage-letter h2{text-align:center;font-size:clamp(14px,2.6vw,18px);line-height:1.4;letter-spacing:1px;margin:0 0 16px}
+.stage-letter p{font-size:clamp(13px,2.1vw,15px);margin:0 0 12px}
+.stage-close{top:16px;right:20px;z-index:5}
+
+/* ===== v14: pictures in the paintings on the wall (world 2) ===== */
+.wall-art{position:absolute;z-index:13;padding:0;border:0;overflow:hidden;cursor:zoom-in;background-color:#150c1e;transition:background-color 1.6s,box-shadow .3s}
+.wall-art::after{content:"";position:absolute;inset:0;z-index:999;pointer-events:none;box-shadow:inset 0 0 8px #000a}
+.wall-art:hover,.wall-art:focus-visible{box-shadow:0 0 18px #ffd39acc}
+.wa-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity 1.6s ease;pointer-events:none}
+.wa-img.on{opacity:1}
+.wall-zoom{position:fixed;inset:0;z-index:650;display:grid;place-items:center;background:#050310ee;cursor:zoom-out;animation:fadein .3s both}
+.wall-zoom img{max-width:92vw;max-height:88vh;border-radius:4px;box-shadow:0 0 0 4px #fff,0 20px 60px #000a}
+
+/* ===== v15: jia + zyad snuggled on the sofa (world 2) — smooth vector art ===== */
+.couple-wrap{position:absolute;z-index:14;pointer-events:none}
+.cp-svg{display:block;width:100%;height:100%;overflow:visible}
+.cp-name{font-family:"Gaegu","Patrick Hand","Comic Sans MS","Chalkboard SE",cursive;font-weight:700;font-size:34px;fill:#fff7fb;stroke:#8a2a5e;stroke-width:6px;paint-order:stroke;stroke-linejoin:round;letter-spacing:1px}
+.cp-tag{animation:cptag 3s ease-in-out infinite alternate}.cp-tag.t2{animation-delay:-1.5s}
+.cp-glow{animation:cpglow 3.4s ease-in-out infinite alternate}
+.cp-blanket{transform-origin:170px 310px;animation:cpbreath 3.4s ease-in-out infinite}
+.cp-bob{animation:cpbob 3.4s ease-in-out infinite}.cp-bob.b2{animation-delay:-1.3s}
+.cp-girl{transform-origin:132px 175px;animation:cpgirl 8s ease-in-out infinite}
+.cp-boy{transform-origin:214px 170px;animation:cpboy 8s ease-in-out infinite}
+.cp-open{transform-box:fill-box;transform-origin:center;animation:cpopen 8s infinite}
+.cp-happy{opacity:0;animation:cphappy 8s infinite}
+.cp-blush{opacity:.55;animation:cpblush 8s ease-in-out infinite}
+.cp-mouth{transform-box:fill-box;transform-origin:center;animation:cpmouth 8s ease-in-out infinite}
+.cp-steam path{animation:cpsteam 3s ease-in-out infinite}.cp-steam path:nth-child(2){animation-delay:-1s}.cp-steam path:nth-child(3){animation-delay:-2s}
+.cp-sp{transform-box:fill-box;transform-origin:center;animation:cpsp 2.6s ease-in-out infinite}.cp-sp.s2{animation-delay:-.8s}.cp-sp.s3{animation-delay:-1.6s}.cp-sp.s4{animation-delay:-2.2s}
+@keyframes cptag{to{transform:translateY(-5px)}}
+@keyframes cpglow{from{opacity:.65}to{opacity:1}}
+@keyframes cpbreath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.03)}}
+@keyframes cpbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes cpgirl{0%,100%{transform:rotate(-1deg)}20%{transform:rotate(2deg)}45%{transform:rotate(4deg)}55%,78%{transform:translate(9px,7px) rotate(11deg)}90%{transform:rotate(1deg)}}
+@keyframes cpboy{0%,100%{transform:rotate(1deg)}20%{transform:rotate(-2deg)}45%{transform:rotate(-4deg)}55%{transform:translate(-9px,9px) rotate(-12deg)}64%{transform:translate(-9px,15px) rotate(-12deg)}72%,78%{transform:translate(-9px,9px) rotate(-12deg)}90%{transform:rotate(-1deg)}}
+@keyframes cpopen{0%,17%{transform:scaleY(1);opacity:1}18.5%{transform:scaleY(.1);opacity:1}20%,51%{transform:scaleY(1);opacity:1}52%,79%{opacity:0}80%{opacity:1;transform:scaleY(1)}91%{transform:scaleY(1)}92%{transform:scaleY(.1)}93%,100%{transform:scaleY(1);opacity:1}}
+@keyframes cphappy{0%,51%{opacity:0}53%,78%{opacity:1}80%,100%{opacity:0}}
+@keyframes cpblush{0%,45%,85%,100%{opacity:.55}55%,78%{opacity:1}}
+@keyframes cpmouth{0%,45%,85%,100%{transform:scale(1)}55%,78%{transform:scale(1.25)}}
+@keyframes cpsteam{0%{transform:translateY(10px);opacity:0}30%{opacity:.85}100%{transform:translateY(-24px);opacity:0}}
+@keyframes cpsp{0%,100%{opacity:.15;transform:scale(.5) rotate(0)}50%{opacity:1;transform:scale(1.15) rotate(20deg)}}
+.cuddle-heart{position:absolute;z-index:16;translate:-50% -50%;pointer-events:none;animation:cuddlefloat 4s ease-out forwards}
+@keyframes cuddlefloat{0%{transform:translate(0,0) scale(.4) rotate(0);opacity:0}15%{opacity:1}60%{transform:translate(calc(var(--dx) * .6),-70px) scale(1) rotate(var(--r))}100%{transform:translate(var(--dx),-120px) scale(1.15) rotate(calc(var(--r) * -1));opacity:0}}
+
+/* ===== v16: the finale (world 7) — night street, her hand, the candle-lit room, the cake ===== */
+.world[data-world="7"]::after{display:none}
+.world[data-world="7"]{background:#050414}
+.fin-scene{position:absolute;inset:0;z-index:1;overflow:hidden}
+.fin-street{background:linear-gradient(#050820 0 55%,#17172e 55%);transition:transform 2.3s cubic-bezier(.55,.02,.85,.4),opacity 1.2s ease .9s}
+.fin-street.going{transform:scale(7)!important;opacity:.0}
+.fin-room{background:#120b14}
+.fin-room.arrive{animation:roomin 2.4s ease-out both}
+@keyframes roomin{from{opacity:0;transform:scale(1.18);filter:brightness(2.6) blur(6px)}to{opacity:1;transform:none;filter:none}}
+.fin-svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.fin-svg text{font-family:"Gaegu","Patrick Hand","Comic Sans MS","Chalkboard SE",cursive;font-weight:700}
+.bub-text{fill:#3a2540}
+.fin-bubble{animation:bubpop .55s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes bubpop{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+
+/* sky + street life */
+.fs{fill:#fff;animation:fstw 3s ease-in-out infinite alternate}
+@keyframes fstw{from{opacity:.2}to{opacity:1}}
+.fin-cloud{animation:fincloud 70s linear infinite alternate}.fin-cloud.c2{animation-duration:95s;animation-direction:alternate-reverse}
+@keyframes fincloud{from{transform:translateX(-60px)}to{transform:translateX(90px)}}
+.fin-sway{animation:finsway 6s ease-in-out infinite alternate}
+@keyframes finsway{from{transform:rotate(-.9deg)}to{transform:rotate(1deg)}}
+.fin-win{animation:finwin 3.2s ease-in-out infinite alternate}
+@keyframes finwin{from{opacity:.88}to{opacity:1}}
+.fin-bulb{animation:finbulb 2.4s ease-in-out infinite alternate}
+@keyframes finbulb{from{opacity:.35}to{opacity:1}}
+.fin-chim circle{transform-box:fill-box;transform-origin:center;animation:finchim 5s ease-out infinite}.fin-chim circle:nth-child(2){animation-delay:-1.7s}.fin-chim circle:nth-child(3){animation-delay:-3.3s}
+@keyframes finchim{0%{transform:translate(0,12px) scale(.6);opacity:0}25%{opacity:1}100%{transform:translate(30px,-60px) scale(1.5);opacity:0}}
+.fin-bokeh circle{animation:finbk 3.5s ease-in-out infinite alternate}.fin-bokeh circle:nth-child(2n){animation-delay:-1.4s}
+@keyframes finbk{to{opacity:.2;transform:translateY(-8px)}}
+.fin-lampglow{animation:finlamp 4s ease-in-out infinite alternate;transform-origin:640px 340px}
+@keyframes finlamp{from{opacity:.82;transform:scale(.97)}to{opacity:1;transform:scale(1.03)}}
+.fin-moths{transform:translate(640px,340px)}
+.fin-moths g{animation:finorbit 4s linear infinite}.fin-moths .m2{animation-duration:6s;animation-direction:reverse}.fin-moths .m3{animation-duration:3s}
+@keyframes finorbit{from{transform:rotate(0) scaleY(.6)}to{transform:rotate(360deg) scaleY(.6)}}
+.fin-fly{fill:#ffe9a0;filter:drop-shadow(0 0 5px #ffe9a0);animation:finfly 6s ease-in-out infinite alternate}
+@keyframes finfly{0%{transform:translate(0,0);opacity:.2}50%{opacity:1}100%{transform:translate(34px,-40px);opacity:.3}}
+
+/* the clickable hand */
+.fin-hot{cursor:pointer;outline:none}
+.fin-ring{transform-box:fill-box;transform-origin:center;animation:finring 2.2s ease-out infinite}
+.fin-ring.r2{animation-delay:-1.1s}
+@keyframes finring{0%{transform:scale(.55);opacity:.95}100%{transform:scale(1.7);opacity:0}}
+.fin-hot:hover .fin-ring,.fin-hot:focus-visible .fin-ring{stroke-width:5}
+.fin-street .fin-hot:hover~.g-street{filter:brightness(1.08)}
+
+/* the girl */
+.g-body{animation:gbreathe 3.4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes gbreathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.008,1.016)}}
+.g-hairback{animation:ghair 4.2s ease-in-out infinite alternate;transform-origin:0 -200px}
+@keyframes ghair{from{transform:rotate(-1.4deg)}to{transform:rotate(1.4deg)}}
+.g-head{transform-origin:0 -166px;animation:ghead 5s ease-in-out infinite alternate}
+@keyframes ghead{from{transform:rotate(-1.6deg)}to{transform:rotate(2deg)}}
+.g-eyes{transform-box:fill-box;transform-origin:center;animation:gblink 4.6s infinite}
+@keyframes gblink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
+.g-happy,.g-pucker{opacity:0}
+.g-blush{opacity:.55}
+.g-armL{transform:rotate(7deg)}.g-armR{transform:rotate(-7deg)}
+/* street: she reaches out to you */
+.fin-street .g-armL{animation:garmreach 2.8s ease-in-out infinite}
+@keyframes garmreach{0%,100%{transform:rotate(86deg)}50%{transform:rotate(95deg)}}
+.fin-street .g-armR{animation:garmhold 3.2s ease-in-out infinite alternate}
+@keyframes garmhold{from{transform:rotate(-6deg)}to{transform:rotate(-12deg)}}
+.fin-street .g-blush{animation:gblush 3s ease-in-out infinite alternate}
+@keyframes gblush{to{opacity:.95}}
+/* room: she presents the cake, then (after the blow) smiles and blows kisses */
+.fin-room .g-armL{transform:rotate(52deg);animation:garmpresent 2.4s ease-in-out infinite alternate}
+@keyframes garmpresent{from{transform:rotate(48deg)}to{transform:rotate(60deg)}}
+.fin-room .g-armR{transform:rotate(-10deg)}
+.fin-room.cele .g-armL{animation:gkiss 3.6s ease-in-out infinite}
+@keyframes gkiss{
+  0%,6%{transform:rotate(40deg)}
+  18%,30%{transform:rotate(-143deg) scaleY(.8)}
+  42%,58%{transform:rotate(-236deg) scaleY(1.08)}
+  74%,100%{transform:rotate(40deg)}}
+.fin-room.cele .g-armR{animation:gwave 1.6s ease-in-out infinite alternate}
+@keyframes gwave{from{transform:rotate(-150deg)}to{transform:rotate(-122deg)}}
+.fin-room.cele .g-eyes{opacity:0}.fin-room.cele .g-happy{opacity:1}
+.fin-room.cele .g-blush{opacity:.95}
+.fin-room.cele .g-pucker{animation:gpucker 3.6s linear infinite}
+.fin-room.cele .g-smile{animation:gsmile 3.6s linear infinite}
+@keyframes gpucker{0%,15%{opacity:0}18%,36%{opacity:1}40%,100%{opacity:0}}
+@keyframes gsmile{0%,15%{opacity:1}18%,36%{opacity:0}40%,100%{opacity:1}}
+.fin-room.cele .g-room{animation:groomhop 1.8s ease-in-out infinite}
+@keyframes groomhop{0%,100%{transform:translate(1290px,888px) scale(1.3)}50%{transform:translate(1290px,880px) scale(1.3)}}
+
+/* candles */
+.fin-flame{transform-box:fill-box}
+.fin-flame .fl{transform-box:fill-box;transform-origin:50% 100%;animation:finflick .32s ease-in-out infinite alternate}
+.fin-flame:nth-of-type(2n) .fl{animation-duration:.41s}
+@keyframes finflick{from{transform:scale(.92,1.04) skewX(-3deg)}to{transform:scale(1.06,.96) skewX(3deg)}}
+.fin-flame.out .fl{animation:finout .5s ease-in forwards}
+@keyframes finout{0%{transform:scale(1.2,1.4)}35%{transform:scale(.8,.5) skewX(14deg)}100%{transform:scale(0);opacity:0}}
+.fin-glow{animation:finglow 2.6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}
+@keyframes finglow{from{opacity:.75;transform:scale(.96)}to{opacity:1;transform:scale(1.04)}}
+.fin-room.blown .cake-glow{animation:none;opacity:.12;transition:opacity 1.2s}
+.fin-cake-ring{opacity:0;transform-box:fill-box;transform-origin:center}
+.fin-cakehot{outline:none}
+.fin-cakehot.on~.fin-cake-ring,.fin-cakehot.on{--x:1}
+.fin-room .fin-cakehot.on{cursor:pointer}
+.fin-room:not(.blown) .fin-cake-ring{animation:finringc 2.4s ease-in-out infinite alternate}
+@keyframes finringc{from{opacity:.25;transform:scale(.97)}to{opacity:.9;transform:scale(1.03)}}
+
+/* overlays */
+.fin-balloons{position:absolute;inset:0;z-index:20;pointer-events:none;overflow:hidden}
+.fin-rise{position:absolute;bottom:-28vh;animation:finrise linear forwards;filter:drop-shadow(0 6px 8px #0006)}
+.fin-rise svg{display:block;width:100%;height:auto}
+@keyframes finrise{0%{transform:translate(0,0) rotate(-4deg)}25%{transform:translate(18px,-34vh) rotate(4deg)}50%{transform:translate(-14px,-72vh) rotate(-3deg)}75%{transform:translate(16px,-108vh) rotate(4deg)}100%{transform:translate(0,-150vh) rotate(-2deg)}}
+.fin-fx{position:absolute;inset:0;width:100%;height:100%;z-index:30;pointer-events:none}
+.fin-hearts{position:absolute;inset:0;z-index:32;pointer-events:none;overflow:hidden}
+.fin-heart{position:absolute;translate:-50% -50%;line-height:1;text-shadow:0 0 10px currentColor;animation:finheart 2.6s ease-out forwards}
+@keyframes finheart{0%{transform:translate(0,0) scale(.3) rotate(0);opacity:0}12%{opacity:1}60%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.25) rotate(var(--r));opacity:0}}
+.fin-flash{position:absolute;inset:0;z-index:35;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 55%,#fff6dc,#ffd890 45%,#ffb868);transition:opacity .9s ease}
+.fin-flash.on{opacity:1}
+.fin-flash.pop{transition:none;animation:finpop .7s ease-out}
+@keyframes finpop{0%{opacity:.75;background:radial-gradient(circle at 50% 55%,#fff,#fff3c9 40%,transparent 75%)}100%{opacity:0}}
+.fin-hint{position:absolute;left:0;right:0;bottom:5%;z-index:34;text-align:center;pointer-events:none;font-family:"Gaegu","Patrick Hand","Comic Sans MS",cursive;font-weight:700;font-size:clamp(18px,2.6vw,26px);color:#fff0fa;
+ text-shadow:0 0 12px #ff9ac9,0 2px 6px #000;opacity:0;transition:opacity 1s}
+.fin-hint.on{opacity:1;animation:finhint 2s ease-in-out infinite alternate}
+@keyframes finhint{from{transform:translateY(0)}to{transform:translateY(-6px)}}
+.fin-shade{position:absolute;inset:0;z-index:22;pointer-events:none;opacity:0;transition:opacity 2.5s ease 1s;
+ background:radial-gradient(ellipse 50% 21% at 50% 27%,#07030fd9,#07030f99 55%,transparent 100%)}
+.fin-shade.on{opacity:1}
+
+/* ===== v17: the finale's scenery is pixel art (the girl stays smooth) ===== */
+.fin-px{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated;pointer-events:none}
+.fin-rise img{display:block;width:100%;height:auto}
+
+/* ===== v18: the private room (garden cottage) — a tiny concert ===== */
+.cnc{position:fixed;inset:0;z-index:420;background:#0d0716;overflow:hidden;cursor:pointer}
+.cnc.hidden{display:none}
+.cnc.in{animation:cncin .95s cubic-bezier(.2,.8,.2,1) both}
+.cnc.out{animation:cncout .6s ease-in both;pointer-events:none}
+@keyframes cncin{from{transform:scale(.05);opacity:0;border-radius:50%}to{transform:none;opacity:1;border-radius:0}}
+@keyframes cncout{from{transform:none;opacity:1}to{transform:scale(.05);opacity:0;border-radius:50%}}
+.cnc-stage{--sw:min(100vw,177.78vh);position:absolute;left:50%;top:50%;width:var(--sw);aspect-ratio:16/9;translate:-50% -50%}
+@media (min-aspect-ratio:13/10){.cnc-stage{--sw:max(100vw,177.78vh)}}
+.cnc-px{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated}
+.cnc-fg{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible;pointer-events:none}
+.cnc-bub{animation:cncbob 3.2s ease-in-out infinite alternate}
+@keyframes cncbob{from{transform:translateY(6px)}to{transform:translateY(-8px)}}
+.cnc-say{position:absolute;left:80.6%;top:43.5%;translate:-50% -50%;text-align:center;pointer-events:none;white-space:nowrap;
+ font-family:"Gaegu","Patrick Hand","Comic Sans MS","Chalkboard SE",cursive;font-weight:400;font-size:calc(var(--sw) * .0165);line-height:1.2;letter-spacing:.09em;color:#fff3fb;text-shadow:0 0 6px #ff9ac9cc,0 0 14px #c98bff88;animation:cncbob 3.2s ease-in-out infinite alternate}
+.cnc-say span{display:inline-block;animation:cncwave 1.5s ease-in-out infinite;animation-delay:calc(var(--i) * -.13s)}
+.cnc-say i{display:inline-block;width:.3em}
+@keyframes cncwave{0%,100%{transform:translateY(.22em) rotate(-7deg)}50%{transform:translateY(-.3em) rotate(7deg)}}
+.cnc-hint{position:absolute;left:0;right:0;bottom:3%;text-align:center;color:#f3e8ff;font-size:clamp(12px,1.6vw,17px);letter-spacing:1px;text-shadow:0 0 10px #000,0 1px 3px #000;opacity:0;animation:cnchint 3s ease 2s forwards}
+@keyframes cnchint{to{opacity:.85}}
+@media (prefers-reduced-motion:reduce){.cnc-say span{animation-duration:1.5s!important;animation-iteration-count:infinite!important}}
+
+/* ===== v19: cottage hover hint, name tags, pixel girl layer ===== */
+.cottage-tip{position:fixed;z-index:175;translate:-50% -100%;max-width:min(300px,80vw);padding:11px 20px;border-radius:99px;text-align:center;pointer-events:none;font-size:clamp(12px,1.5vw,15px);line-height:1.5;letter-spacing:.3px;color:#fff6d6;
+ background:radial-gradient(ellipse at 50% 0,#3a2468ee,#1a0f34ee);border:1px solid #ffd39a88;text-shadow:0 0 8px #ffd39a,0 0 18px #ff9ac9;animation:cottageglow 1.5s ease-in-out infinite alternate}
+.cottage-tip.hidden{display:none}
+@keyframes cottageglow{from{box-shadow:0 0 12px #ffd39a55,0 0 30px #ff9ac933;text-shadow:0 0 6px #ffd39a,0 0 12px #ff9ac9}to{box-shadow:0 0 24px #ffd39acc,0 0 56px #ff9ac966;text-shadow:0 0 12px #ffe9b8,0 0 26px #ff9ac9}}
+.cnc-tag{position:absolute;translate:-50% -100%;padding:.25em .9em .3em;border-radius:99px;pointer-events:none;white-space:nowrap;
+ font-family:"Gaegu","Patrick Hand","Comic Sans MS","Chalkboard SE",cursive;font-weight:700;font-size:calc(var(--sw) * .02);color:#fff6e8;letter-spacing:.04em;
+ background:#1b0f2ecc;border:1px solid #ffd39a99;box-shadow:0 0 12px #ffd39a55;text-shadow:0 0 8px #ffd39a;opacity:0;animation:cnchint .8s ease 1s forwards}
+.cnc-tag::after{content:"";position:absolute;left:50%;top:100%;translate:-50% 0;border:.35em solid transparent;border-top-color:#ffd39a99}
+.cnc-tag-guy{left:49%;top:33%}
+.cnc-tag-girl{left:80.6%;top:60%}
+
+/* =====================================================================
+   v20: THE PICNIC EVENING (world 3)
+   sun sets -> two pixel people walk in from the left, drag the sheet to the middle of the hill,
+   sit, she gives him a gift -> glossy heart -> big glass heart with 2 batches (burnt to ash)
+   -> night + moon -> heart goes back in the box -> they walk home right -> pixel message.
+   The sky / hill / moon / stars are painted by the script on the canvas; this is everything else.
+   ===================================================================== */
+
+/* the layer every picnic-evening thing lives on. --u = one "pixel" of the 192x108 scene */
+.pic-fx{position:absolute;inset:0;z-index:10;pointer-events:none;overflow:hidden;
+ --u:min(calc(100vw / 192),calc(100vh / 108));--night:0;--br:1}
+@media (max-aspect-ratio:1/1){.pic-fx{--u:min(calc(100vw / 100),calc(100vh / 108))}}
+/* night comes in as a soft vignette; while the big heart is open the edges dim a little */
+.pic-fx::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;opacity:calc(var(--night) * .55);
+ background:radial-gradient(ellipse at 50% 45%,transparent 35%,#02051a 120%)}
+.pic-fx::before{content:"";position:absolute;inset:0;z-index:25;pointer-events:none;opacity:0;transition:opacity 1.2s;
+ background:radial-gradient(ellipse at 50% 50%,transparent 45%,#0a041f77 100%)}
+.pic-fx:has(.pg-heart.big)::before{opacity:1}
+
+/* ---- everything on the hill dims as night falls ---- */
+.pic-act,.pic-sheet,.pic-basket{filter:brightness(var(--br)) saturate(calc(1 - var(--night) * .25))}
+
+/* ---- the picnic sheet ---- */
+.pic-sheet{position:absolute;z-index:4;width:calc(40 * var(--u));height:calc(12 * var(--u));translate:-50% -50%;
+ transition:left var(--mt,0ms) ease-in-out,top var(--mt,0ms) ease-in-out,scale .9s ease,rotate .9s ease,opacity .6s}
+.pic-sheet canvas{display:block;width:100%;height:100%;image-rendering:pixelated;box-shadow:0 calc(.5 * var(--u)) 0 #0000002e}
+.pic-sheet.drag{rotate:-1.4deg}
+.pic-sheet.drag canvas{transform-origin:100% 50%;animation:sheetwave .5s ease-in-out infinite alternate}
+.pic-sheet.fold{scale:.2 .5;rotate:-14deg;z-index:12}
+@keyframes sheetwave{from{transform:skewY(-2.5deg) scaleX(.985)}to{transform:skewY(2.5deg) scaleX(1)}}
+
+/* little dust puffs kicked up while the sheet is dragged */
+.pic-dust{position:absolute;z-index:5;width:calc(2.2 * var(--u));height:calc(1.3 * var(--u));border-radius:50%;background:#efe6c8cc;
+ filter:blur(1px);animation:pdust 1s ease-out forwards}
+@keyframes pdust{to{transform:translate(calc(-2 * var(--u)),calc(-3 * var(--u))) scale(2.3);opacity:0}}
+
+/* ---- the two pixel people (20 x 28 canvas, feet on the point) ---- */
+.pic-act{position:absolute;z-index:9;width:calc(20 * var(--u));height:calc(28 * var(--u));translate:-50% -100%;
+ transition:left var(--mt,0ms) linear,top var(--mt,0ms) linear}
+.pic-act.girl{z-index:10}
+.pic-act canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.pic-act canvas.fl{transform:scaleX(-1)}
+.pic-act::before{content:"";position:absolute;left:50%;bottom:calc(-.7 * var(--u));width:calc(13 * var(--u));height:calc(2.4 * var(--u));
+ translate:-50% 0;border-radius:50%;background:#0000002e;z-index:-1}
+
+/* ---- the picnic basket he sets down ---- */
+.pic-basket{position:absolute;z-index:8;width:calc(9 * var(--u));height:calc(8 * var(--u));translate:-50% -100%}
+.pic-basket canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+
+/* ---- floating hearts while they look at each other ---- */
+.pic-lh{position:absolute;z-index:18;translate:-50% -100%;font-size:calc(3 * var(--u));line-height:1;color:#ff5b8a;
+ text-shadow:0 0 8px #ff5b8a,0 0 2px #fff;animation:piclove 2.6s ease-out forwards}
+@keyframes piclove{0%{transform:translate(0,0) scale(.4);opacity:0}18%{opacity:1}100%{transform:translate(var(--dx,0),calc(-11 * var(--u))) scale(1.15);opacity:0}}
+
+/* ---- small floating hint labels ("open the gift ✦", "tap the heart ♥") ---- */
+.pic-hint{position:absolute;z-index:40;translate:-50% -100%;white-space:nowrap;padding:.15em .8em .25em;border-radius:99px;
+ font-family:"Gaegu","Patrick Hand","Comic Sans MS",cursive;font-weight:700;font-size:clamp(15px,calc(3.2 * var(--u)),30px);color:#fff;
+ background:#3a1a5acc;box-shadow:0 0 14px #ff9ac988;text-shadow:0 0 10px #ff9ac9,0 1px 3px #000;animation:pichint 1.4s ease-in-out infinite alternate}
+@keyframes pichint{to{transform:translateY(calc(-1.2 * var(--u)))}}
+
+/* ---- fireflies that wake up when it gets dark ---- */
+.pic-ff{position:absolute;z-index:3;width:calc(.7 * var(--u));height:calc(.7 * var(--u));opacity:var(--night);animation:ffdrift 7s ease-in-out infinite alternate}
+.pic-ff i{display:block;width:100%;height:100%;border-radius:50%;background:#fff3a8;box-shadow:0 0 calc(1.6 * var(--u)) calc(.4 * var(--u)) #ffe27acc;animation:ffblink 2.2s ease-in-out infinite alternate}
+@keyframes ffdrift{0%{transform:translate(0,0)}50%{transform:translate(calc(3 * var(--u)),calc(-3 * var(--u)))}100%{transform:translate(calc(-2 * var(--u)),calc(-5 * var(--u)))}}
+@keyframes ffblink{from{opacity:.15}to{opacity:1}}
+
+/* ---- THE GIFT ---- */
+.pic-gift{position:absolute;z-index:11;width:calc(8 * var(--u));aspect-ratio:1;padding:0;border:0;background:none;translate:-50% -100%;
+ pointer-events:none;cursor:default;transform-origin:50% 100%;filter:drop-shadow(0 0 calc(.8 * var(--u)) #ff9ac988);
+ transition:left 1.4s ease-in-out,top 1.4s ease-in-out,opacity .8s,scale .8s ease}
+.pic-gift svg{display:block;width:100%;height:100%;overflow:visible}
+.gf-lid{transform-box:view-box;transform-origin:8px 31px;transition:transform .55s cubic-bezier(.3,1.6,.5,1)}
+.pic-gift.ready{pointer-events:auto;cursor:pointer;animation:giftwig 1.7s ease-in-out infinite}
+.pic-gift.ready:hover,.pic-gift.ready:focus-visible{scale:1.15;outline:none;filter:drop-shadow(0 0 calc(1.4 * var(--u)) #ffd0ef)}
+.pic-gift.ready::after{content:"";position:absolute;inset:-18%;border-radius:50%;border:2px solid #ffd0ef;pointer-events:none;animation:ringpulse 1.8s ease-out infinite}
+.pic-gift.open{pointer-events:none;cursor:default;animation:none}
+.pic-gift.open .gf-lid{transform:translate(-5px,-16px) rotate(-28deg)}
+@keyframes giftwig{0%,40%,100%{rotate:0deg}8%{rotate:-7deg}16%{rotate:7deg}24%{rotate:-5deg}32%{rotate:4deg}}
+@keyframes ringpulse{from{transform:scale(.7);opacity:.9}to{transform:scale(1.5);opacity:0}}
+
+/* ---- THE HEART: small + glossy -> big + see-through ---- */
+.pg-heart{position:absolute;z-index:16;width:calc(9 * var(--u));aspect-ratio:100/88;translate:-50% -50%;container-type:inline-size;
+ pointer-events:none;transition:left 1.3s ease-in-out,top 1.3s ease-in-out,width 1.3s cubic-bezier(.3,1.15,.4,1),scale .8s ease,opacity .9s ease}
+.pg-heart.born{scale:.2;opacity:0}
+.pg-heart.tuck{scale:.12;opacity:0}
+.pg-heart.ready{pointer-events:auto;cursor:pointer}
+.pg-heart.ready:hover,.pg-heart.ready:focus-visible{scale:1.14;outline:none}
+.pg-bob{position:absolute;inset:0;animation:pgbob 2.4s ease-in-out infinite alternate}
+.pg-bob svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;transition:opacity 1.1s ease}
+.g-glossy{filter:drop-shadow(0 0 calc(1.3 * var(--u)) #ff5b8acc)}
+.g-glass{opacity:0;filter:drop-shadow(0 0 3cqw #ff9ac9aa)}
+.pg-heart.ready .pg-bob::after{content:"";position:absolute;inset:-16%;border-radius:50%;border:2px solid #ffd0ef;pointer-events:none;animation:ringpulse 1.8s ease-out infinite}
+.pg-heart::after{content:"✦";position:absolute;left:62%;top:6%;font-size:calc(2.4 * var(--u));color:#fff;text-shadow:0 0 8px #fff,0 0 16px #ff9ac9;
+ pointer-events:none;animation:pgsp 1.6s ease-in-out infinite}
+@keyframes pgbob{from{transform:translateY(calc(-1 * var(--u))) rotate(-3deg)}to{transform:translateY(calc(1 * var(--u))) rotate(3deg)}}
+@keyframes pgsp{0%,100%{opacity:.2;transform:scale(.5) rotate(0)}50%{opacity:1;transform:scale(1.2) rotate(30deg)}}
+@keyframes pgbeat{50%{transform:scale(1.014)}}
+
+/* tapped: it flies to the middle of the screen and grows into a big transparent heart */
+.pg-heart.big{left:50%!important;top:52%!important;z-index:30;pointer-events:none;
+ width:min(94vw,calc(80vh * 1.136))}
+.pg-heart.big .g-glossy{opacity:0}
+.pg-heart.big .g-glass{opacity:1}
+.pg-heart.big .pg-bob{animation:pgbeat 3s ease-in-out infinite}
+.pg-heart.big .pg-bob::after,.pg-heart.big::after{display:none}
+
+/* the inside of the big heart: photos + message + hint */
+.pg-in{position:absolute;inset:0;z-index:2}
+.pg-ph{position:absolute;left:var(--pl);top:33%;width:var(--pw);aspect-ratio:1;translate:-50% -50%;rotate:var(--pr);padding:0;
+ border-radius:8%;overflow:hidden;cursor:pointer;pointer-events:auto;outline:none;
+ box-shadow:0 0 0 .45cqw #fff,0 .8cqw 2.6cqw #0008,0 0 3cqw #ff9ac988;transition:scale .25s,opacity .6s}
+.pg-ph:hover,.pg-ph:focus-visible{scale:1.06}
+.pg-ph canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.pg-ph{animation:jumpin .9s cubic-bezier(.2,1.4,.4,1) backwards}
+.pg-text{position:absolute;left:50%;top:49%;width:54%;max-height:25%;translate:-50% 0;overflow-y:auto;text-align:center;white-space:pre-line;
+ font-family:"Gaegu","Patrick Hand","Comic Sans MS",cursive;font-weight:700;font-size:clamp(12px,3.1cqw,30px);line-height:1.3;color:#fff8fc;
+ text-shadow:0 1px 6px #5a0a3acc,0 0 12px #ff5b8a99,0 0 3px #3a0a30;scrollbar-width:thin;scrollbar-color:#ffffff66 transparent;pointer-events:auto}
+.pg-hint{position:absolute;left:50%;top:77%;translate:-50% 0;white-space:nowrap;pointer-events:none;
+ font-family:"Gaegu","Patrick Hand","Comic Sans MS",cursive;font-weight:700;font-size:clamp(11px,2.7cqw,24px);letter-spacing:.06em;color:#ffe3f3;
+ text-shadow:0 0 10px #ff9ac9,0 1px 4px #000;transition:opacity .6s;animation:pichint 1.2s ease-in-out infinite alternate}
+
+/* ash / smoke canvas that the pictures burn into (placed over the screen by the script) */
+.pg-ash{position:fixed;z-index:700;pointer-events:none;image-rendering:pixelated}
+
+/* ---- the last message, in pixels, in the middle of the screen ---- */
+.pic-end{position:absolute;left:50%;top:50%;z-index:60;translate:-50% -50%;width:min(860px,88vw);padding:calc(3.4 * var(--u)) calc(3.6 * var(--u));
+ text-align:center;font-family:"Press Start 2P","Courier New",monospace;font-size:clamp(11px,calc(2.1 * var(--u)),22px);line-height:2.1;letter-spacing:.02em;
+ color:#fff7fc;background:#150a2cdd;image-rendering:pixelated;
+ box-shadow:0 0 0 4px #150a2c,0 0 0 8px #ff9ac9,0 0 0 12px #150a2c,0 0 40px 12px #ff9ac955;
+ text-shadow:2px 2px 0 #c0407a;animation:fadein .6s both}
+.pic-end span{white-space:pre-wrap}
+.pic-end i{display:inline-block;width:.6em;height:1em;margin-left:.3em;vertical-align:-.12em;background:#ffd0ef;animation:pixblink .8s steps(2) infinite}
+@keyframes pixblink{50%{opacity:0}}
+
+@media (max-width:700px){
+ .pg-text{width:58%;max-height:24%}
+ .pic-end{line-height:1.9}
+}
+
+/* =====================================================================
+   v21: ONE batch of 4 pictures (2 x 2) in the big heart — glowing frames, sparkles, a real heartbeat
+   ===================================================================== */
+
+/* the whole big heart (glass + pictures + message) beats: lub-dub ... lub-dub */
+.pg-heart.big{animation:pgheartbeat 1.35s ease-in-out 1.4s infinite}
+.pg-heart.big .pg-bob{animation:none}
+.pg-heart.big .g-glass{animation:pgglass 1.35s ease-in-out 1.4s infinite}
+@keyframes pgheartbeat{0%,100%{scale:1}14%{scale:1.05}28%{scale:1}42%{scale:1.032}70%{scale:1}}
+@keyframes pgglass{0%,100%{filter:drop-shadow(0 0 3cqw #ff9ac9aa)}14%{filter:drop-shadow(0 0 7cqw #ff4f8ae6)}28%{filter:drop-shadow(0 0 3cqw #ff9ac9aa)}42%{filter:drop-shadow(0 0 5.5cqw #ff6fa5cc)}}
+/* the small glossy heart beats too, while it floats */
+.g-glossy{transform-origin:50% 55%;animation:pgsmallbeat 1.2s ease-in-out infinite}
+@keyframes pgsmallbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.12)}28%{transform:scale(1)}42%{transform:scale(1.07)}70%{transform:scale(1)}}
+.pg-heart.big .g-glossy{animation:none}
+
+/* the pictures: glowing, pulsing borders; frame no longer clips so the sparkles can sit outside it */
+.pg-ph{top:var(--pt,33%);overflow:visible;
+ animation:jumpin .9s cubic-bezier(.2,1.4,.4,1) backwards,pgborder 2.2s ease-in-out infinite alternate}
+.pg-ph canvas{border-radius:inherit}
+@keyframes pgborder{
+ from{box-shadow:0 0 0 .45cqw #fff,0 0 1.4cqw .3cqw #ffe3f3,0 0 3cqw .4cqw #ff9ac9aa,0 0 5cqw #c98bff44}
+ to  {box-shadow:0 0 0 .45cqw #fff,0 0 2.4cqw .9cqw #ffffff,0 0 5.5cqw 1.1cqw #ff5b8acc,0 0 9cqw 1cqw #c98bff88}}
+
+/* sparkles around each picture */
+.pg-sp{position:absolute;left:var(--sx);top:var(--sy);translate:-50% -50%;pointer-events:none;line-height:1;color:#fff;
+ font-size:clamp(10px,3.4cqw,34px);text-shadow:0 0 .8cqw #fff,0 0 1.8cqw #ff9ac9,0 0 3cqw #ff5b8a;
+ animation:pgtw var(--st,1.8s) ease-in-out var(--sd,0s) infinite}
+@keyframes pgtw{0%,100%{opacity:.1;transform:scale(.4) rotate(0deg)}50%{opacity:1;transform:scale(1.25) rotate(35deg)}}
+
+/* 4-picture layout: two rows of pictures, the message sits in the space underneath */
+.pg-in[data-n="4"] .pg-text{top:64%;width:46%;max-height:15%;font-size:clamp(11px,2.8cqw,28px);line-height:1.25}
+.pg-in[data-n="4"] .pg-hint{top:80.5%}
+
+/* =====================================================================
+   v24: the ending — a smoky, cloudy breeze rolls in from the left carrying the letters, the letters
+   sway with it, then the breeze lifts them and carries them away to the right.   + a brief hug
+   ===================================================================== */
+.pic-end{background:none;box-shadow:none;padding:calc(5 * var(--u)) calc(4 * var(--u));z-index:60;animation:none;
+ text-shadow:0 0 6px #1a0a3af0,0 0 14px #c98bffcc,2px 2px 0 #7a3a9a}
+.pe-w{display:inline-block;white-space:nowrap}
+.pe-l{display:inline-block;font-weight:400;
+ animation:pearrive 3s cubic-bezier(.2,.7,.25,1) var(--d,0s) backwards,pesway 2.8s ease-in-out calc(var(--d,0s) + 3s) infinite alternate}
+@keyframes pearrive{
+ 0%{opacity:0;filter:blur(14px);translate:var(--dx) var(--dy);rotate:var(--dr);scale:1.7}
+ 35%{opacity:.55}
+ 100%{opacity:1;filter:blur(0);translate:0 0;rotate:0deg;scale:1}}
+/* every letter ripples in turn (the delay grows along the sentence) = a breeze passing through the words */
+@keyframes pesway{from{transform:translate(-.14em,.1em) rotate(-3deg)}to{transform:translate(.16em,-.16em) rotate(3deg)}}
+/* at the end the letters are blown away to the right, left ones first, melting into smoke */
+.pic-end.away .pe-l{animation:peaway 3.4s cubic-bezier(.5,0,.85,.55) var(--ad,0s) forwards}
+@keyframes peaway{
+ 0%{opacity:1;filter:blur(0);translate:0 0;rotate:0deg;scale:1}
+ 25%{opacity:1;filter:blur(1px)}
+ 100%{opacity:0;filter:blur(13px);translate:var(--ex) var(--ey);rotate:var(--er);scale:1.6}}
+
+/* the smoke: a long band of soft puffs, each drifting slowly on its own */
+.pic-smoke{--off:calc(50vw + max(65vw,450px) + 30px);position:absolute;left:50%;top:50%;z-index:58;width:max(130vw,900px);height:54vmin;translate:-50% -50%;
+ pointer-events:none;opacity:0;transform:translateX(calc(-1 * var(--off)))}
+.sm-p{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:calc(var(--s) * var(--ar));translate:-50% -50%;rotate:var(--r)}
+.sm-p i{display:block;width:100%;height:100%;border-radius:50%;
+ background:radial-gradient(closest-side,rgba(var(--c),var(--o)),rgba(var(--c),calc(var(--o) * .5)) 42%,rgba(var(--c),0) 100%);
+ animation:smpuff var(--dd) ease-in-out var(--dl) infinite alternate}
+@keyframes smpuff{from{transform:translate(-5%,4%) scale(.9)}to{transform:translate(6%,-7%) scale(1.14)}}
+.pic-smoke.in{animation:smin 4.4s cubic-bezier(.2,.65,.25,1) forwards}
+.pic-smoke.out{animation:smout 5s cubic-bezier(.5,0,.7,.6) forwards}
+@keyframes smin{0%{transform:translateX(calc(-1 * var(--off)));opacity:0}18%{opacity:1}100%{transform:translateX(0);opacity:1}}
+@keyframes smout{0%{transform:translateX(0);opacity:1}70%{opacity:1}100%{transform:translateX(var(--off));opacity:0}}
+
+/* the hug: brief, they lean in gently toward each other and let go */
+.pic-act.hugging{--lean:2deg;transform-origin:50% 100%;animation:hugg 1.9s ease-in-out forwards}
+.pic-act.girl.hugging{--lean:-2deg}
+@keyframes hugg{0%{rotate:0deg;scale:1 1}22%,78%{rotate:var(--lean);scale:1.02 .98}100%{rotate:0deg;scale:1 1}}
+
+/* =====================================================================
+   v25: bigger pictures in the heart, with soft, fading, dreamy edges
+   ===================================================================== */
+/* the heart itself is a bit larger, so everything inside it grows too */
+.pg-heart.big{width:min(96vw,calc(86vh * 1.136))}
+
+/* no hard white frame any more: the picture's edge fades away into a soft pulsing glow */
+.pg-ph{border-radius:14%;
+ box-shadow:0 0 2.5cqw .2cqw #ffd0ef66,0 0 5cqw #ff9ac955,0 0 8cqw #c98bff33;
+ animation:jumpin .9s cubic-bezier(.2,1.4,.4,1) backwards,pgborder2 2.6s ease-in-out infinite alternate}
+.pg-ph canvas{border-radius:14%;
+ -webkit-mask-image:linear-gradient(to right,transparent 0,#000 11%,#000 89%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 11%,#000 89%,transparent 100%);
+ -webkit-mask-composite:source-in;
+ mask-image:linear-gradient(to right,transparent 0,#000 11%,#000 89%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 11%,#000 89%,transparent 100%);
+ mask-composite:intersect}
+@keyframes pgborder2{
+ from{box-shadow:0 0 2.5cqw .2cqw #ffd0ef55,0 0 5cqw #ff9ac944,0 0 8cqw #c98bff30}
+ to  {box-shadow:0 0 4cqw .8cqw #ffe3f3aa,0 0 8cqw 1cqw #ff6fa5aa,0 0 12cqw #c98bff66}}
+
+/* the message and hint make room under the bigger pictures */
+.pg-in[data-n="4"] .pg-text{top:68%;width:44%;max-height:12.5%;font-size:clamp(11px,2.7cqw,26px)}
+.pg-in[data-n="4"] .pg-hint{top:82.5%}
+
+/* =====================================================================
+   v26: the "a wish" video book (world 2) + room for the long message under the heart pictures (world 3)
+   ===================================================================== */
+.book-view.video{left:50%;top:44%;width:auto;height:min(58vh,520px);aspect-ratio:480/854;border-radius:6%;overflow:visible;background:none;
+ box-shadow:0 0 0 3px #ffffffcc,0 14px 40px #000a,0 0 46px #ffd39a99}
+.book-view.video video{display:block;width:100%;height:100%;object-fit:cover;border-radius:6%;background:#000}
+.vid-cap{position:absolute;left:50%;top:100%;translate:-50% 0;margin-top:16px;width:max-content;max-width:min(440px,88vw);text-align:center;
+ font-size:clamp(15px,2.8vw,21px);line-height:1.5;letter-spacing:.4px;color:#fff;text-shadow:0 0 14px #ffb347,0 0 6px #ff9ac9,0 2px 6px #000;animation:fadein 1.2s .5s both}
+
+/* the long message sits right under the four pictures */
+.pg-in[data-n="4"] .pg-text{top:63.5%;width:48%;max-height:24%;font-size:clamp(10px,2.15cqw,22px);line-height:1.22;text-wrap:balance}
+.pg-in[data-n="4"] .pg-hint{top:88.5%;font-size:clamp(10px,2.1cqw,20px)}
+@media (max-width:700px){.pg-in[data-n="4"] .pg-text{width:58%;max-height:26%}}
+
+/* =====================================================================
+   v27: a bigger heart, bigger pictures, and a message block that follows the curve of the heart
+   ===================================================================== */
+/* the heart is now taller than before; only its very tip dips below the screen edge */
+.pg-heart.big{--hw:min(98vw,calc(115vh * 1.136));width:var(--hw);top:max(calc(1.5vh + var(--hw) * .44),50%)!important}
+@keyframes pgheartbeat{0%,100%{scale:1}14%{scale:1.035}28%{scale:1}42%{scale:1.022}70%{scale:1}}
+
+/* the message sits in a block that narrows with the heart (the two floats carve out the heart's lower outline) */
+.pg-in[data-n="4"] .pg-text{left:20%;top:67.8%;width:60%;height:19.7%;max-height:none;translate:none;overflow-y:auto;
+ font-size:clamp(10px,2cqw,34px);line-height:1.2;text-wrap:wrap}
+.pg-fl,.pg-fr{display:none}
+.pg-in[data-n="4"] .pg-fl,.pg-in[data-n="4"] .pg-fr{display:block;width:50%;height:100%;shape-margin:.6cqw}
+.pg-in[data-n="4"] .pg-fl{float:left;shape-outside:polygon(0% 0%, 8.0% 0.0%, 15.2% 12.5%, 22.8% 25.0%, 30.6% 37.5%, 38.8% 50.0%, 47.2% 62.5%, 55.9% 75.0%, 64.9% 87.5%, 74.1% 100.0%, 0% 100%)}
+.pg-in[data-n="4"] .pg-fr{float:right;shape-outside:polygon(100% 0%, 92.0% 0.0%, 84.8% 12.5%, 77.2% 25.0%, 69.4% 37.5%, 61.2% 50.0%, 52.8% 62.5%, 44.1% 75.0%, 35.1% 87.5%, 25.9% 100.0%, 100% 100%)}
+/* the hint sits up in the little dip between the two top curves of the heart */
+.pg-in[data-n="4"] .pg-hint{top:9.5%;font-size:clamp(11px,2.3cqw,26px)}
+
+/* =====================================================================
+   v28: the heart message — same font as the letters (Courier New), centred, bigger, with a scroll bar
+   ===================================================================== */
+.pg-in[data-n="4"] .pg-fl,.pg-in[data-n="4"] .pg-fr{display:none;shape-outside:none}
+.pg-in[data-n="4"] .pg-text{left:30%;top:66%;width:40%;height:16.5%;max-height:none;translate:none;box-sizing:border-box;
+ overflow-y:scroll;text-align:center;white-space:pre-line;padding:.2em .9em 1.6em;
+ font-family:"Courier New",monospace;font-weight:400;font-size:max(15px,1.8cqw);line-height:1.6;letter-spacing:0;text-wrap:wrap;
+ color:#fff8fc;text-shadow:0 0 6px #3a0a40,0 1px 3px #000,0 0 12px #ff5b8a88;
+ scrollbar-width:thin;scrollbar-color:#ffb6dfdd #ffffff26;
+ -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 5%,#000 82%,transparent 100%);
+ mask-image:linear-gradient(to bottom,transparent 0,#000 5%,#000 82%,transparent 100%)}
+.pg-in[data-n="4"] .pg-text::-webkit-scrollbar{width:7px}
+.pg-in[data-n="4"] .pg-text::-webkit-scrollbar-track{background:#ffffff26;border-radius:6px}
+.pg-in[data-n="4"] .pg-text::-webkit-scrollbar-thumb{background:#ffb6dfdd;border-radius:6px}
+@media (max-width:700px){.pg-in[data-n="4"] .pg-text{left:26%;width:48%;font-size:max(13px,3.4cqw)}}
+
+/* =====================================================================
+   v29: rebalanced — heart fits the screen again, mid-size pictures, a slightly smaller message font
+   ===================================================================== */
+.pg-heart.big{--hw:min(96vw,calc(96vh * 1.136));width:var(--hw);top:max(calc(1.5vh + var(--hw) * .44),50%)!important}
+.pg-in[data-n="4"] .pg-text{left:31%;top:65.5%;width:38%;height:17%;font-size:max(14px,1.55cqw)}
+@media (max-width:700px){.pg-in[data-n="4"] .pg-text{left:26%;width:48%;font-size:max(12px,3cqw)}}
+
+/* =====================================================================
+   v30: the last scene of zyad's galaxy — pink fades back to blue, the heart returns, a Milky Way spells a line
+   ===================================================================== */
+.candy-sky.fade{transition:opacity 5.5s ease-in-out}
+.candy-fx.out{transition:opacity 2.6s ease-in;opacity:0}
+
+/* v31: the heart moon glows pale yellow, the Milky Way is more vivid */
+.moon-heart canvas{filter:drop-shadow(0 0 44px #ffe7a0cc) drop-shadow(0 0 12px #fff4c8aa)}
+
+/* v32 (retired: the Milky Way is gone) */
+
+/* v33: the rocket that comes back and writes the line with its smoke */
+.skyship{position:absolute;left:0;top:0;width:30px;aspect-ratio:9/10;z-index:8;pointer-events:none;will-change:transform}
+.skyship canvas{width:100%;height:100%;image-rendering:pixelated;filter:drop-shadow(0 0 8px #ffb37a)}
+
+/* v34: the sky-written line (white cloud-smoke) and the little love heart that rises when the sky turns pink */
+.sky-ink{position:absolute;inset:0;width:100%;height:100%;z-index:7;pointer-events:none}
+.love-heart{position:absolute;right:3.5%;bottom:-190px;z-index:30;width:min(52vw,230px);pointer-events:none;animation:lhRise 6.5s cubic-bezier(.22,.7,.25,1) forwards}
+.love-heart.out{animation:none;translate:0 calc(-14vh - 190px);opacity:0;transition:opacity 1.8s ease-in}
+.lh-in{display:flex;flex-direction:column;align-items:center;animation:lhSway 3.2s ease-in-out infinite alternate}
+.lh-icon{width:56px;margin-top:2px}
+.lh-icon canvas{width:100%;display:block;image-rendering:pixelated;filter:drop-shadow(0 0 12px #ff9ac9);animation:beat 1.1s ease-in-out infinite}
+.lh-text{position:relative;margin-bottom:12px;padding:10px 14px;border-radius:16px;background:#fffaf2f2;color:#6a1f58;text-align:center;
+ font-family:"Gaegu","Patrick Hand","Comic Sans MS",cursive;font-weight:700;font-size:clamp(14px,1.5vw,19px);line-height:1.3;box-shadow:0 4px 18px #c0407a55,0 0 0 3px #ffd0ef;opacity:0;animation:lhPop .9s 3.4s both}
+.lh-text::after{content:"";position:absolute;left:50%;bottom:-10px;translate:-50% 0;border:10px solid transparent;border-bottom:0;border-top-color:#fffaf2}
+@keyframes lhRise{0%{translate:0 0;opacity:0}12%{opacity:1}100%{translate:0 calc(-14vh - 190px);opacity:1}}
+@keyframes lhSway{from{transform:translateX(-7px)}to{transform:translateX(7px)}}
+@keyframes lhPop{from{opacity:0;transform:scale(.7) translateY(8px)}to{opacity:1;transform:none}}
+
+/* v35: a long caption under a gallery group (the little things book) */
+.gal-cap.wide{max-width:min(560px,88vw)}
+
+/* v36: a long message in a book (a place you left behind): the box scrolls and reads left-aligned */
+.dialogue.long{bottom:6%;max-width:min(640px,90%);padding:20px 22px 20px 28px}
+.dialogue.long #dialogueText{display:block;max-height:72vh;overflow-y:auto;text-align:left;font-size:clamp(14px,2.2vw,17px);line-height:1.75;padding-right:10px}
+.dialogue.long #dialogueText strong{display:block;text-align:center;margin-bottom:10px}
+
+/* ===== OPEN-BOOK ("a place you left behind") ===== */
+.book-view.storybook{display:flex;align-items:center;justify-content:center;overflow:hidden;--w:min(400px,42vw);--h:min(580px,78vh);font-family:'Caveat','Gaegu',cursive}
+.sbk-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%}
+.sbk-shift{transition:transform 1.3s cubic-bezier(.5,0,.2,1);transform:translateX(calc(var(--w) / -2))}
+.sbk-shift.open{transform:none}
+.sbk-book{position:relative;width:calc(var(--w)*2);height:var(--h);perspective:2400px}
+.sbk-page,.sbk-cover{position:absolute;left:50%;top:0;width:50%;height:100%}
+.sbk-page{background:#fbf4e6;border-radius:0 8px 8px 0;box-shadow:0 10px 30px rgba(0,0,0,.45);overflow-y:auto;padding:7% 8% 6% 9%;background-image:linear-gradient(90deg,rgba(90,50,50,.18),transparent 7%)}
+.sbk-page p{margin:0 0 .75em;font-size:clamp(15px,1.55vw + 3px,21px);line-height:1.38;color:#5a3b3f}
+.sbk-cover{z-index:2;transform-origin:left center;transform-style:preserve-3d;transition:transform 1.4s cubic-bezier(.5,0,.2,1);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.sbk-shift.open .sbk-cover{transform:rotateY(-180deg)}
+.sbk-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:0 8px 8px 0}
+.sbk-front{background:linear-gradient(135deg,#8a5668,#7a4a5a);box-shadow:0 12px 34px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;text-align:center;padding:10%}
+.sbk-front::before{content:"";position:absolute;inset:5%;border:2px solid #e6c58a;border-radius:4px;opacity:.7}
+.sbk-front h1{margin:0;font-weight:600;font-size:clamp(30px,4vw,48px);line-height:1.1;color:#e6c58a;letter-spacing:0;text-transform:none}
+.sbk-front small{display:block;margin-top:14px;font-size:24px;opacity:.8}
+.sbk-back{transform:rotateY(180deg);background:#fbf4e6;border-radius:8px 0 0 8px;box-shadow:0 10px 30px rgba(0,0,0,.45);background-image:linear-gradient(270deg,rgba(90,50,50,.18),transparent 7%)}
+.sbk-back svg{width:100%;height:100%;display:block}
+.sbk-hint{margin-top:22px;font-size:24px;color:#ffeaf7;opacity:.8;transition:opacity .6s;animation:sbkPulse 2.4s ease-in-out infinite}
+.sbk-hint.gone{opacity:0;animation:none}
+@keyframes sbkPulse{50%{transform:translateY(-3px);opacity:.45}}
+.sbk-s{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+.sbk-shift.open .sbk-s{animation:sbkDraw var(--t) ease-in-out var(--d) forwards}
+@keyframes sbkDraw{to{stroke-dashoffset:0}}
+.sbk-title{font-family:'Caveat',cursive;font-weight:600;font-size:46px;fill:#5a3b3f;stroke:#fbf4e6;stroke-width:5px;paint-order:stroke;opacity:0}
+.sbk-shift.open .sbk-title{animation:sbkFade 1.4s ease var(--d) forwards}
+@keyframes sbkFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.sbk-s{stroke-dashoffset:0!important;animation:none!important}.sbk-title{opacity:1!important;animation:none!important}}
+@media (max-width:700px){
+  .book-view.storybook{--w:min(92vw,400px);--h:min(41vh,400px)}
+  .sbk-shift{transform:translateY(calc(var(--h) / -2))}
+  .sbk-shift.open{transform:none}
+  .sbk-book{width:var(--w);height:calc(var(--h)*2)}
+  .sbk-page,.sbk-cover{left:0;top:50%;width:100%;height:50%}
+  .sbk-page{border-radius:0 0 8px 8px;background-image:linear-gradient(180deg,rgba(90,50,50,.15),transparent 6%);padding:6% 7%}
+  .sbk-page p{font-size:18px}
+  .sbk-cover{transform-origin:center top}
+  .sbk-shift.open .sbk-cover{transform:rotateX(180deg)}
+  .sbk-face{border-radius:0 0 8px 8px}
+  .sbk-back{transform:rotateX(180deg);border-radius:8px 8px 0 0;background-image:none}
+}
+
+/* ===== GLOBE BOOK ("this reminds me of you") ===== */
+.storybook .gal-close{z-index:9}
+.gbk-pg{display:flex;align-items:center;justify-content:center;text-align:center}
+.gbk-say{font-size:clamp(26px,3.4vw,40px);line-height:1.25;color:#5a3b3f;font-weight:600}
+.gbk-say small{display:block;margin-top:10px;color:#b8862a;font-size:.8em}
+.gbk-arrow{display:block;font-size:1.2em;color:#b8862a;animation:gbkNudge 1.6s ease-in-out infinite}
+@keyframes gbkNudge{50%{transform:translateX(-8px)}}
+.gbk-globe{transition:opacity .7s}.gbk-globe.gone{opacity:0;pointer-events:none}
+.gbk-spark{transform-box:fill-box;transform-origin:center;animation:gbkTw 1.8s ease-in-out infinite}
+@keyframes gbkTw{50%{transform:scale(1.35) rotate(20deg);opacity:.6}}
+.gbk-stage{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,rgba(42,31,107,0),rgba(4,3,12,0));transition:background 1.8s}
+.gbk-stage.on{background:radial-gradient(circle at 50% 45%,#2a1f6b 0%,#0c0824 55%,#04030c 100%)}
+.gbk-stage canvas{max-width:100%}.gbk-stage canvas.lift{transition:transform 1.9s cubic-bezier(.25,.1,.2,1)}
+.gbk-note{position:absolute;left:0;right:0;bottom:6%;text-align:center;font-size:28px;color:#ffe7b0;opacity:0;transition:opacity 1s;pointer-events:none;text-shadow:0 0 14px #ffb347}
+.gbk-note.show{opacity:1;animation:sbkPulse 2s ease-in-out infinite}
+.gbk-city{position:absolute;z-index:4;left:50%;top:50%;width:min(92vw,540px);max-height:94vh;overflow:auto;background:#0d0a24;border-radius:50%;opacity:0;
+  transform:translate(calc(-50% + var(--ox)),calc(-50% + var(--oy))) scale(.04);box-shadow:0 0 70px rgba(255,190,110,.4),0 0 0 1px rgba(255,214,140,.55);transition:transform 1.2s cubic-bezier(.2,.8,.2,1),opacity .5s,border-radius 1.2s}
+.gbk-city.open{opacity:1;transform:translate(-50%,-50%) scale(1);border-radius:22px}
+.gbk-city svg{display:block;width:100%}
+.gbk-ct{padding:6px 24px 22px;text-align:center;color:#ffeedd;opacity:0}
+.gbk-ct b{display:block;font-size:30px;color:#ffd36b;font-weight:600;text-shadow:0 0 14px rgba(255,190,100,.6)}
+.gbk-ct p{margin:6px 0 0;font-size:clamp(19px,2.6vw,24px);line-height:1.4}
+.gbk-city.open .gbk-ct{animation:sbkFade 1.8s ease 2.6s forwards}
+.gbk-rise{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(0)}
+.gbk-city.open .gbk-rise{animation:gbkRise 1s cubic-bezier(.2,.9,.3,1) var(--d) forwards}
+@keyframes gbkRise{to{transform:scaleY(1)}}
+.gbk-win{opacity:0}.gbk-city.open .gbk-win{animation:gbkWin 2.4s ease var(--d) forwards}
+@keyframes gbkWin{0%{opacity:0}30%{opacity:1}100%{opacity:.8}}
+.gbk-tw{animation:gbkStar 2.6s ease-in-out infinite}@keyframes gbkStar{50%{opacity:.25}}
+.gbk-fin{animation:gbkTw 2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+
+/* ===== ocean scene ===== */
+.gbk-sea{position:absolute;inset:0;z-index:5;overflow:hidden;clip-path:circle(0px at var(--cx) var(--cy));transition:clip-path 1.9s cubic-bezier(.3,.1,.2,1);background:#58b9f5}
+.gbk-sea.open{clip-path:circle(160vmax at var(--cx) var(--cy))}
+.gbk-sea canvas{width:100%;height:100%;display:block}
+.gbk-otext{position:absolute;left:0;right:0;margin:0 auto;bottom:5%;width:min(90vw,560px);box-sizing:border-box;padding:16px 22px;border-radius:18px;background:rgba(255,255,255,.34);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#0d3b5e;text-align:center;font-size:clamp(20px,2.7vw,26px);line-height:1.4;opacity:0;animation:sbkFade 1.8s ease 2.4s forwards;box-shadow:0 8px 30px rgba(0,60,100,.25)}
+.gbk-next{display:block;margin:0 auto 18px;background:none;border:1px solid rgba(255,214,140,.7);color:#ffe7b0;border-radius:20px;padding:4px 18px;font:inherit;font-size:22px;cursor:pointer;opacity:0}
+.gbk-city.open .gbk-next{animation:sbkFade 1.2s ease 6.4s forwards}
+.gbk-next:hover{background:rgba(255,214,140,.15)}
+
+/* ===== playground (night) ===== */
+.gbk-sea.gbk-night{background:#04071c}
+.gbk-ptext{background:rgba(10,14,40,.5);color:#e8ecff;box-shadow:0 8px 30px rgba(0,0,30,.5)}
+.gbk-sea .gbk-next{position:absolute;top:6%;left:0;right:0;margin:0 auto;width:max-content;color:#0d3b5e;border-color:rgba(13,59,94,.6);background:rgba(255,255,255,.4);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.gbk-sea.open .gbk-next{animation:sbkFade 1.2s ease 5s forwards}
+
+/* ===== bustling multan street ===== */
+.gbk-veh{transform:translateX(-130px)}
+.gbk-city.open .gbk-veh.r{animation:gbkDriveR var(--dur) linear var(--dl) infinite}
+.gbk-city.open .gbk-veh.l{animation:gbkDriveL var(--dur) linear var(--dl) infinite}
+@keyframes gbkDriveR{from{transform:translateX(-130px)}to{transform:translateX(500px)}}
+@keyframes gbkDriveL{from{transform:translateX(500px)}to{transform:translateX(-130px)}}
+.gbk-vr{font-family:'Caveat','Gaegu',cursive;font-weight:600;font-style:italic;font-size:12px;fill:#ffe3a8;paint-order:stroke;stroke:#0d0919;stroke-width:2px;transform-box:fill-box;transform-origin:center;animation:gbkVr .3s ease-in-out infinite alternate}
+@keyframes gbkVr{from{transform:translateY(0) skewX(-8deg)}to{transform:translateY(-2px) skewX(8deg)}}
+.gbk-rain{animation:gbkRain 1.1s linear infinite}
+@keyframes gbkRain{from{transform:translate(0,-12px)}to{transform:translate(-8px,275px)}}
+.gbk-lamp{animation:gbkLamp 3.2s ease-in-out infinite}@keyframes gbkLamp{0%,100%{opacity:1}45%{opacity:.55}50%{opacity:.9}}
+.gbk-bob{animation:gbkBob 3.4s ease-in-out infinite alternate}@keyframes gbkBob{to{transform:translateY(-3px)}}
+.gbk-ct p{margin:8px 0 0;font-size:clamp(18px,2.3vw,22px);line-height:1.38}
+.gbk-city.open .gbk-next{animation-delay:11s}
+
+/* ===== multan: a pixel-art street, full screen, with a little book on a vendor's cart ===== */
+.gbk-town{position:absolute;inset:0;z-index:5;overflow:hidden;background:#1a1226;clip-path:circle(0px at var(--cx) var(--cy));transition:clip-path 1.7s cubic-bezier(.3,.1,.2,1)}
+.gbk-town.open{clip-path:circle(160vmax at var(--cx) var(--cy))}
+.gbk-town-cv{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:-moz-crisp-edges;image-rendering:pixelated}
+.gbk-town::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,transparent 50%,rgba(40,14,60,.38)),linear-gradient(rgba(120,60,170,.18),rgba(255,130,60,.16))}
+.gbk-snd{position:absolute;left:14px;bottom:14px;z-index:6;width:40px;height:40px;border-radius:50%;font-size:18px;line-height:1;color:#fff;background:rgba(30,14,34,.5);border:1px solid rgba(255,255,255,.4);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:.2s}
+.gbk-snd:hover{background:rgba(30,14,34,.7);transform:scale(1.07)}
+
+/* the clickable book on the cart */
+.gbk-bookbtn{position:absolute;z-index:4;border-radius:10px;cursor:pointer;background:none;border:0}
+.gbk-bookbtn:hover{box-shadow:0 0 0 2px rgba(255,231,176,.8),0 0 22px rgba(255,200,110,.8)}
+.gbk-bkhint{position:absolute;z-index:4;white-space:nowrap;pointer-events:none;font-size:clamp(22px,2.4vw,30px);color:#ffe7b0;text-shadow:0 0 14px #ffb347,0 2px 0 #3a1a0a,0 0 4px #3a1a0a;opacity:0;transform:translate(-50%,-100%);padding:1px 14px 3px;border-radius:99px;background:rgba(30,14,34,.55)}
+.gbk-town.open .gbk-bkhint{animation:gbkBkIn 1s ease 1.6s forwards,gbkBkBob 1.8s ease-in-out 2.6s infinite}
+@keyframes gbkBkIn{to{opacity:1}}
+@keyframes gbkBkBob{0%,100%{transform:translate(-50%,-100%)}50%{transform:translate(-50%,-118%)}}
+
+/* the book: opens at the bottom right, so the street stays in view */
+.gbk-bk{position:absolute;z-index:5;right:max(2vw,10px);bottom:max(3vh,12px);width:min(680px,94vw);height:min(60vh,450px);perspective:1800px;opacity:0;pointer-events:none}
+.gbk-bk.show{opacity:1;pointer-events:auto}
+.gbk-bkpg,.gbk-cvb,.gbk-cvf{box-sizing:border-box}
+.gbk-bkpg{position:absolute;right:0;top:0;width:50%;height:100%;display:flex;flex-direction:column;padding:26px 24px 12px 26px;border-radius:2px 9px 9px 2px;color:#3b2616;
+  background:linear-gradient(90deg,rgba(120,80,50,.28),rgba(255,251,238,.82) 9%),linear-gradient(rgba(250,238,208,.8),rgba(250,238,208,.8));box-shadow:0 14px 40px rgba(30,10,20,.5),inset 0 0 36px rgba(214,172,110,.28)}
+.gbk-cv{position:absolute;right:0;top:0;width:50%;height:100%;transform-origin:left center;transform-style:preserve-3d;transition:transform 1.5s cubic-bezier(.5,0,.2,1)}
+.gbk-bk.open .gbk-cv{transform:rotateY(-180deg)}
+.gbk-cvf,.gbk-cvb{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.gbk-cvf{display:flex;align-items:center;justify-content:center;border-radius:2px 9px 9px 2px;background:linear-gradient(135deg,#b5303f,#7a1626);box-shadow:0 14px 40px rgba(30,10,20,.5),inset 0 0 0 6px rgba(230,185,74,.55),inset 0 0 0 8px rgba(122,22,38,.9)}
+.gbk-cvf span{font-size:clamp(26px,4vw,40px);color:#f6d98a;text-shadow:0 2px 0 #4a0c18}
+.gbk-cvb{transform:rotateY(180deg);display:flex;flex-direction:column;padding:26px 26px 12px 24px;border-radius:9px 2px 2px 9px;color:#3b2616;
+  background:linear-gradient(270deg,rgba(120,80,50,.28),rgba(255,251,238,.82) 9%),linear-gradient(rgba(250,238,208,.8),rgba(250,238,208,.8));box-shadow:inset 0 0 36px rgba(214,172,110,.28)}
+.gbk-ink{overflow:auto;flex:1;min-height:0;padding:0 4px;text-align:center;text-shadow:0 0 7px rgba(255,248,230,.8);scrollbar-width:thin;scrollbar-color:rgba(107,58,30,.4) transparent}
+.gbk-ink b{display:block;font-size:30px;color:#8a3f1a;font-weight:600}
+.gbk-ink p{margin:8px 0 0;font-size:clamp(16px,1.75vw,21px);line-height:1.36}
+.gbk-bkpg .gbk-next{margin:8px auto 4px;color:#6b3a1e;border-color:rgba(107,58,30,.55);background:rgba(255,255,255,.4);text-shadow:none;opacity:0}
+.gbk-bkpg .gbk-next:hover{background:rgba(255,255,255,.7)}
+.gbk-bk.open .gbk-next{animation:sbkFade 1.2s ease 4s forwards}
+@media (max-width:560px){.gbk-bk{width:98vw;height:62vh;right:1vw}.gbk-bkpg,.gbk-cvb{padding:18px 12px 8px}.gbk-ink p{font-size:15px;line-height:1.3}.gbk-ink b{font-size:24px}}

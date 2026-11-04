@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>a small world</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- BOOT: the "totally normal application" (script.js types it line by line) -->
+<div id="boot" class="screen active">
+  <div class="boot-cosmic"></div>
+  <div class="boot-moon"></div>
+  <div id="bootTerminal" class="boot-terminal"></div>
+</div>
+
+<div id="game">
+
+  <div id="hud" class="hidden">
+    <div class="hud-left"><span id="worldLabel">garden</span></div>
+    <div class="hud-right"><span id="foundCount">0</span> found <button id="musicToggle">♫</button></div>
+  </div>
+
+  <!-- THE HAND: sits low on the right, jumps / waves / blows hearts, click it to travel -->
+  <div id="journeyHand" class="journey-hand hidden">
+    <div id="handMsg" class="hand-msg"></div>
+    <button id="handButton" class="hand-emoji" aria-label="take the hand">🖐</button>
+  </div>
+
+  <!-- THE BACK ARMS: left side, two arms reaching for you, take you to the previous world -->
+<div id="backHand" class="back-hand hidden">
+  <div class="back-msg">you can always come back with me</div>
+  <button id="backBtn" class="back-arms" aria-label="go back to the previous world">
+    <svg viewBox="0 0 112 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <g id="armShape">
+          <rect x="-4" y="-8" width="66" height="16" rx="8" fill="#ffe6f3"/>
+          <rect x="-4" y="-12" width="26" height="24" rx="7" fill="#3b2a7a"/>
+          <rect x="19" y="-12" width="5" height="24" rx="2.5" fill="#7ad7ff"/>
+          <ellipse cx="68" cy="0" rx="14" ry="11" fill="#ffe6f3"/>
+          <g stroke="#ffe6f3" stroke-width="5" stroke-linecap="round" fill="none">
+            <path d="M75 -7 L96 -11"/><path d="M77 -2 L100 -3"/>
+            <path d="M77 4 L98 5"/><path d="M75 8 L93 13"/>
+            <path d="M64 -9 L78 -22"/>
+          </g>
+        </g>
+      </defs>
+      <g transform="translate(0 32) rotate(-6)"><g class="arm arm-a"><use href="#armShape"/></g></g>
+      <g transform="translate(0 82) rotate(6)"><g class="arm arm-b"><use href="#armShape"/></g></g>
+    </svg>
+  </button>
+</div>
+
+  <!-- colour boom between worlds -->
+  <div id="bloomOverlay" class="bloom-overlay hidden">
+    <div class="bloom-burst"></div>
+    <div class="bloom-lightning l1"></div><div class="bloom-lightning l2"></div><div class="bloom-lightning l3"></div>
+  </div>
+
+  <!-- Pixel canvases + clickable hotspots are added to each world by script.js -->
+
+  <!-- WORLD 1 — NIGHT GARDEN -->
+  <section class="world" data-world="1">
+    <div id="butterflies"></div><div id="fireflies"></div><div id="shootingStars"></div>
+  </section>
+
+  <!-- WORLD 2 — MEMORY -->
+  <section class="world" data-world="2">
+    <div class="world-title">WORLD 02<small>THE PLACES YOU LEFT IN ME</small></div>
+    <div class="world-subtitle">hover the books on the shelf. open the ones that glow.</div>
+    <div id="memoryOrbs" class="memory-orbs"></div>
+  </section>
+
+  <!-- WORLD 3 — PICNIC ARCHIVE (a story told one picture at a time) -->
+  <section class="world" data-world="3">
+    <div class="world-title">WORLD 03<small>THE ARCHIVE</small></div>
+    <div id="storyStage" class="story-stage"></div>
+  </section>
+
+  <!-- WORLD 4 — INSIDE MY HEART (envelopes) -->
+  <section class="world" data-world="4">
+    <div class="heart-hint">WORLD 04<b>things i never said out loud</b></div>
+    <div id="heartBox" class="heart-box"><div id="envelopeField" class="envelope-field"></div></div>
+    <div id="letterStage" class="letter-stage hidden">
+      <div id="stageEnvelope" class="stage-envelope">
+        <div class="env-body"></div>
+        <div class="stage-letter" id="stageLetter"></div>
+        <div class="env-flap"></div>
+      </div>
+      <button id="stageClose" class="stage-close">×</button>
+    </div>
+  </section>
+
+  <!-- WORLD 5 — SPACESHIP TO THE HEART MOON -->
+  <section class="world" data-world="5">
+    <div id="meteorLayer"></div>
+    <div id="moonHeart" class="moon-heart"></div>
+    <div id="ship" class="ship"></div>
+    <div id="finalLetter" class="final-letter"></div>
+  </section>
+
+  <!-- WORLD 6 — PINK SUNSET BEACH (the birds rise over the sun and bring the message) -->
+  <section class="world" data-world="6">
+    <div id="sunsetBirds" class="sunset-birds"></div>
+    <div id="sunsetText" class="sunset-text"></div>
+  </section>
+
+  <!-- WORLD 7 — THE FINALE (night street -> candle-lit room -> the cake). script.js builds everything inside this section. -->
+  <section class="world" data-world="7"></section>
+
+</div>
+
+<div id="dialogue" class="dialogue hidden"><span id="dialogueText"></span><button id="dialogueClose">×</button></div>
+<div id="fxLayer"></div>
+<audio id="music" loop></audio>
+
+<script src="script.js"></script>
+</body>
+</html>
